@@ -256,7 +256,10 @@ Token nextToken(FILE *file) {
       }
     }
     else if (currentState == 11) {
-      if (isprint(c)) {
+      if (c == '\\') {
+        currentState = 48;
+        ch = c;
+      } else if (isprint(c)) {
         currentState = 19;
         ch = c;
       }
@@ -320,6 +323,38 @@ Token nextToken(FILE *file) {
         currentState = 30;
       }
     }
+    else if (currentState == 48) {
+      if (c == 'n') {
+        currentState = 49;
+        ch = c;
+      } else if (c == '0') {
+        currentState = 50;
+        ch = c;
+      }
+      else {
+        error("Unexpected character");
+      }
+    }
+    else if (currentState == 49) {
+      if (c == '\'') {
+        currentState = 51;
+        nextToken.type = CNL;
+        return nextToken;
+      }
+      else {
+        error("Unexpected character");
+      }
+    }
+    else if (currentState == 50) {
+      if (c == '\'') {
+        currentState = 52;
+        nextToken.type = CNULL;
+        return nextToken;
+      }
+      else {
+        error("Unexpected character");
+      }
+    }
     if (c == EOF) {
       nextToken.type = EOP;
       return nextToken;
@@ -375,6 +410,14 @@ void printToken(Token token) {
 
     case SN:
       printf("<SN, %s> \n", signTable[token.tableIdx]);
+      break;
+
+    case CNULL:
+      printf("<CNULL> \n");
+      break;
+
+    case CNL:
+      printf("<CNL> \n");
       break;
 
     case EOP:

@@ -26,8 +26,10 @@
 * CCT: Constante caracter
 * LT: Literal, ou cadeia de caracter
 * EOP: End of program
+* CNULL: CCT com valor igual a '\0'
+* CNL: CCT com valor igual a \n
 */
-enum TOKEN_TYPE {ID=1, KW, SN, ICT, FCT, CCT, LT, EOP};
+enum TOKEN_TYPE {ID=1, KW, SN, ICT, FCT, CCT, LT, EOP, CNULL, CNL};
 
 enum KEYWORDS {
   CLASS = 1, DATA, CODE, 

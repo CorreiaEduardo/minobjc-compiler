@@ -1,1 +1,1 @@
-token     != == = = < <= >= =       abc + - (token)   /**/ x = 1 /* asdasdas21312../*dahsbdas */ "string"if else&& &|
+token     != == = = < <= >= =   '\0'   abc + - (token)'\n'   /**/ x = 1 /* asdasdas21312../*dahsbdas */ "string"if else&& void class bool&|
