@@ -120,6 +120,15 @@ Token nextToken(FILE *file) {
         nextToken.tableIdx = CL_BRACKETS;
         return nextToken;
       }
+      else if (c == '^') {
+        currentState = 53;
+        nextToken.type = SN;
+        nextToken.tableIdx = CIRCUMFLEX;
+        return nextToken;
+      }
+      else {
+        error("Unexpected character");
+      }
     }
     else if (currentState == 1) {
       if (isalpha(c)) {

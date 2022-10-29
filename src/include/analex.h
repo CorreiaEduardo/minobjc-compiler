@@ -45,7 +45,7 @@ enum SIGNS {
   OP_BRACES, CL_BRACES, // {, }
   OP_PARENTHESIS, CL_PARENTHESIS, // (, )
   OP_BRACKETS, CL_BRACKETS, // [, ]
-  PLUS, MINUS, ASTERISK, SLASH, DOUBLE_AMP, DOUBLE_PIPE,  // +, -, *, /, &&, ||
+  PLUS, MINUS, ASTERISK, SLASH, DOUBLE_AMP, DOUBLE_PIPE, CIRCUMFLEX, // +, -, *, /, &&, ||, ^
   EXCLAMATION_MARK, DOUBLE_EQ, NOT_EQ, LESS_EQ, LESS, GREATER_EQ, GREATER,  // !, ==, !=, <=, <, >=, >
   AMP, PIPE, EQ
 };
@@ -99,6 +99,7 @@ static const char * const signTable[] = {
   [SLASH] = "SLASH",
   [DOUBLE_AMP] = "DOUBLE_AMP",
   [DOUBLE_PIPE] = "DOUBLE_PIPE",
+  [CIRCUMFLEX] = "CIRCUMFLEX",
   [EXCLAMATION_MARK] = "EXCLAMATION_MARK",
   [DOUBLE_EQ] = "DOUBLE_EQ",
   [NOT_EQ] = "NOT_EQ",
