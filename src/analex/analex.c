@@ -62,9 +62,6 @@ Token nextToken(FILE *file) {
       }
       else if (c == ':') {
         currentState = 38;
-        nextToken.type = SN;
-        nextToken.tableIdx = COLON;
-        return nextToken;
       }
       else if (c == '_') {
         currentState = 39;
@@ -362,6 +359,20 @@ Token nextToken(FILE *file) {
       }
       else {
         error("Unexpected character");
+      }
+    }
+    else if (currentState == 38) {
+      if (c == ':') {
+        currentState = 54;
+        nextToken.type = SN;
+        nextToken.tableIdx = DOUBLE_COLON;
+        return nextToken;
+      } else {
+        currentState = 55;
+        nextToken.type = SN;
+        nextToken.tableIdx = COLON;
+        ungetc(c, file);
+        return nextToken;
       }
     }
     if (c == EOF) {
