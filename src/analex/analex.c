@@ -30,92 +30,92 @@ Token nextToken(FILE *file) {
       else if (c == '&') currentState = 7;
       else if (c == '|') currentState = 8;
       else if (c == '!') currentState = 9;
-      else if (c == '=') currentState = 33; // state 9 variant
-      else if (c == '<') currentState = 34; // state 9 variant
-      else if (c == '>') currentState = 35; // state 9 variant
+      else if (c == '=') currentState = 22;
+      else if (c == '<') currentState = 23;
+      else if (c == '>') currentState = 24;
       else if (c == '\'') currentState = 11;
       else if (c == '\"') currentState = 13;
       else if (c == '/') currentState = 28;
       else if (c == '+') {
-        currentState = 36; // state 3 variant
+        currentState = 3;
         nextToken.type = SN;
         nextToken.tableIdx = PLUS;
         return nextToken;
       }
       else if (c == '-') {
-        currentState = 37; // state 3 variant
+        currentState = 4;
         nextToken.type = SN;
         nextToken.tableIdx = MINUS;
         return nextToken;
       }
       else if (c == '*') {
-        currentState = 38; // state 3 variant
+        currentState = 36;
         nextToken.type = SN;
         nextToken.tableIdx = ASTERISK;
         return nextToken;
       }
       else if (c == ';') {
-        currentState = 39; // state 3 variant
+        currentState = 37;
         nextToken.type = SN;
         nextToken.tableIdx = SEMI_COLON;
         return nextToken;
       }
       else if (c == ':') {
-        currentState = 40; // state 3 variant
+        currentState = 38;
         nextToken.type = SN;
         nextToken.tableIdx = COLON;
         return nextToken;
       }
       else if (c == '_') {
-        currentState = 41; // state 3 variant
+        currentState = 39;
         nextToken.type = SN;
         nextToken.tableIdx = UNDERSCORE;
         return nextToken;
       }
       else if (c == ',') {
-        currentState = 42; // state 3 variant
+        currentState = 40;
         nextToken.type = SN;
         nextToken.tableIdx = COMMA;
         return nextToken;
       }
       else if (c == '.') {
-        currentState = 43; // state 3 variant
+        currentState = 41;
         nextToken.type = SN;
         nextToken.tableIdx = DOT;
         return nextToken;
       }
       else if (c == '{') {
-        currentState = 44; // state 3 variant
+        currentState = 42;
         nextToken.type = SN;
         nextToken.tableIdx = OP_BRACES;
         return nextToken;
       }
       else if (c == '}') {
-        currentState = 45; // state 3 variant
+        currentState = 43;
         nextToken.type = SN;
         nextToken.tableIdx = CL_BRACES;
         return nextToken;
       }
       else if (c == '(') {
-        currentState = 46; // state 3 variant
+        currentState = 44;
         nextToken.type = SN;
         nextToken.tableIdx = OP_PARENTHESIS;
         return nextToken;
       }
       else if (c == ')') {
-        currentState = 47; // state 3 variant
+        currentState = 45;
         nextToken.type = SN;
         nextToken.tableIdx = CL_PARENTHESIS;
         return nextToken;
       }
       else if (c == '[') {
-        currentState = 48; // state 3 variant
+        currentState = 46;
         nextToken.type = SN;
         nextToken.tableIdx = OP_BRACKETS;
         return nextToken;
       }
       else if (c == ']') {
-        currentState = 49; // state 3 variant
+        currentState = 47;
         nextToken.type = SN;
         nextToken.tableIdx = CL_BRACKETS;
         return nextToken;
@@ -213,42 +213,42 @@ Token nextToken(FILE *file) {
         return nextToken;
       }
     }
-    else if (currentState == 33) { // state 9 variant
+    else if (currentState == 22) {
       if (c == '=') {
-        currentState = 43;
+        currentState = 25;
         nextToken.type = SN;
         nextToken.tableIdx = DOUBLE_EQ;
         return nextToken;
       } else {
-        currentState = 53;
+        currentState = 33;
         nextToken.type = SN;
         nextToken.tableIdx = EQ;
         ungetc(c, file);
         return nextToken;
       }
     }
-    else if (currentState == 34) { // state 9 variant
+    else if (currentState == 23) {
       if (c == '=') {
-        currentState = 44;
+        currentState = 26;
         nextToken.type = SN;
         nextToken.tableIdx = LESS_EQ;
         return nextToken;
       } else {
-        currentState = 54;
+        currentState = 34;
         nextToken.type = SN;
         nextToken.tableIdx = LESS;
         ungetc(c, file);
         return nextToken;
       }
     }
-    else if (currentState == 35) { // state 9 variant
+    else if (currentState == 24) {
       if (c == '=') {
-        currentState = 45;
+        currentState = 32;
         nextToken.type = SN;
         nextToken.tableIdx = GREATER_EQ;
         return nextToken;
       } else {
-        currentState = 55;
+        currentState = 35;
         nextToken.type = SN;
         nextToken.tableIdx = GREATER;
         ungetc(c, file);
