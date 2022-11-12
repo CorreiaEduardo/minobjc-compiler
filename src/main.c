@@ -1,9 +1,8 @@
-#include "include/analex.h"
+#include "include/anasint.h"
 
-static const char INPUT_FILE[] = "../examples/analex.moc";
+static const char INPUT_FILE[] = "../examples/anasint.moc";
 
-int main(int argc, char const *argv[])
-{
+void analex() {
   FILE *fd;
   Token token;
 
@@ -17,6 +16,27 @@ int main(int argc, char const *argv[])
   }
 
   fclose(fd);
+  printf("\n");
   system("pause");
+}
+
+void anasint() {
+  FILE *fd;
+
+  if ((fd = fopen(INPUT_FILE, "r")) == NULL)
+    error("Não foi possivel ler o código fonte.");
+
+  executeSyntaxAnalysis(fd);
+
+  fclose(fd);
+  printf("\n");
+  system("pause");
+}
+
+int main(int argc, char const *argv[])
+{
+  analex();
+  anasint();
+
   return 0;
 }

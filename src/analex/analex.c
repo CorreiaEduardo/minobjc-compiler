@@ -10,7 +10,7 @@ int findKw(char lexema[]);
 int createLiteral(char literal[]);
 
 Token nextToken(FILE *file) {
-  printf("--- DEBUG: Scanning next token...");
+  printf("\n--- DEBUG: Scanning next token...");
 
   int currentState = 0, lexemeLength = 0, numberLength = 0, literalLength = 0;
   char ch = (char) 0;
@@ -416,39 +416,39 @@ void printToken(Token token) {
   switch (token.type)
   {
     case ID:
-      printf("<ID, %s> \n", token.lexeme);
+      printf("<ID, %s>", token.lexeme);
       break;
 
     case ICT:
-      printf("<ICT, %d> \n", token.integerVal);
+      printf("<ICT, %d>", token.integerVal);
       break;
 
     case FCT:
-      printf("<FCT, %f> \n", token.floatVal);
+      printf("<FCT, %f>", token.floatVal);
       break;
 
     case CCT:
-      printf("<CCT, %c> \n", token.charVal);
+      printf("<CCT, %c>", token.charVal);
       break;
 
     case LT:
-      printf("<LT, %s> \n", literalTable[token.tableIdx]);
+      printf("<LT, %s>", literalTable[token.tableIdx]);
       break;
 
     case KW:
-      printf("<KW, %s> \n", kwTable[token.tableIdx]);
+      printf("<KW, %s>", kwTable[token.tableIdx]);
       break;
 
     case SN:
-      printf("<SN, %s> \n", signTable[token.tableIdx]);
+      printf("<SN, %s>", signTable[token.tableIdx]);
       break;
 
     case CNULL:
-      printf("<CNULL> \n");
+      printf("<CNULL>");
       break;
 
     case CNL:
-      printf("<CNL> \n");
+      printf("<CNL>");
       break;
 
     case EOP:

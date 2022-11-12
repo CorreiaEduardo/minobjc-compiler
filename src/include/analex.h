@@ -116,6 +116,7 @@ static const char * const signTable[] = {
 
 typedef struct {
   enum TOKEN_TYPE type;
+  int processed;
   union {
     char lexeme[LEXEME_MAX_LENGTH]; //ID
     int tableIdx; //KW, SN, LT

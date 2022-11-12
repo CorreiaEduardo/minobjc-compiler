@@ -1,0 +1,9 @@
+class teste {
+  data:
+    int foo;
+  code:
+    void bar();
+  intern:
+    void lorem();
+    int lorem(int ^ipsum, bool test[], char &what, float t[]);
+}
