@@ -32,7 +32,7 @@
 enum TOKEN_TYPE {ID=1, KW, SN, ICT, FCT, CCT, LT, EOP, CNULL, CNL};
 
 enum KEYWORDS {
-  CLASS = 1, DATA, CODE, 
+  CLASS = 1, DATA, CODE, INTERN,
   CHAR, INT, FLOAT, BOOL, VOID, 
   IF, ELSE, WHILE, FOR, 
   RETURN, DELETE, NEW
@@ -77,6 +77,7 @@ static const char * const kwTable[] = {
   [RETURN] = "RETURN",
   [DELETE] = "DELETE",
   [NEW] = "NEW",
+  [INTERN] = "INTERN"
 };
 
 static const char * const signTable[] = {
