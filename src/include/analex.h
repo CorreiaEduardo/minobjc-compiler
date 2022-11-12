@@ -47,7 +47,7 @@ enum SIGNS {
   OP_BRACKETS, CL_BRACKETS, // [, ]
   PLUS, MINUS, ASTERISK, SLASH, DOUBLE_AMP, DOUBLE_PIPE, CIRCUMFLEX, DOUBLE_COLON, // +, -, *, /, &&, ||, ^, ::
   EXCLAMATION_MARK, DOUBLE_EQ, NOT_EQ, LESS_EQ, LESS, GREATER_EQ, GREATER,  // !, ==, !=, <=, <, >=, >
-  AMP, PIPE, EQ
+  AMP, PIPE, EQ // & | =
 };
 
 static const char * const typeNames[] = {

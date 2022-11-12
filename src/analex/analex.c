@@ -192,7 +192,11 @@ Token nextToken(FILE *file) {
         nextToken.tableIdx = DOUBLE_AMP;
         return nextToken;
       } else {
-        error("Unexpected character");
+        currentState = 56;
+        nextToken.type = SN;
+        nextToken.tableIdx = AMP;
+        ungetc(c, file);
+        return nextToken;
       }
     }
     else if (currentState == 8) {
