@@ -126,6 +126,10 @@ Token nextToken(FILE *file) {
         nextToken.tableIdx = CIRCUMFLEX;
         return nextToken;
       }
+      else if (c == EOF) {
+        nextToken.type = EOP;
+        return nextToken;
+      }
       else {
         error("Unexpected character");
       }
