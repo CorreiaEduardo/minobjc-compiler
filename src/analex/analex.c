@@ -1,6 +1,9 @@
 #include "../include/analex.h"
 
 const char BLANK = ' ';
+const char NEW_LINE = '\n';
+const char TAB = '\t';
+
 int literalCount = 0;
 
 int findKw(char lexema[]);
@@ -18,7 +21,7 @@ Token nextToken(FILE *file) {
     char c = fgetc(file);
     
     if (currentState == 0) {
-      if (c == BLANK) continue;
+      if (c == BLANK || c == NEW_LINE || c == TAB) continue;
       else if (isalpha(c)) {
         currentState = 1;
         lexeme[lexemeLength] = c;
