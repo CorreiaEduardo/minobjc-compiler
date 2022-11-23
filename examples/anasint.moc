@@ -1,9 +1,43 @@
-class teste {
+int za;
+
+class a {
   data:
-    int foo;
+    int ^a, ^b[10];
   code:
-    void bar();
+    void ^g(int ^h,char i[]);
+    int j();
   intern:
-    void lorem();
-    int lorem(int ^ipsum, bool test[], char &what, float t[]);
+    char k();
+    bool lmn();
+}
+
+int o, pq;
+float rs();
+float t(), u();
+char v[2];
+
+float x() {
+  float b;
+  if(as!=b) {
+  ;
+  }
+  while(a>i) {
+    delete a;
+    for(;;){return a;}
+  }
+}
+
+float ^y::z() {}
+
+float ^aa::bb(bool cc) {
+  dd = 1 + 5;
+}
+
+char cc::dd() {
+  if(ee>3){
+    ff.gg();
+    hh.ii(2, 3 ,55);
+  } else {
+    ^jj.kk(-ll.mm[1]);
+  }
 }

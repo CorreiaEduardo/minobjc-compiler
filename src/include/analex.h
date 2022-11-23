@@ -33,7 +33,7 @@ enum TOKEN_TYPE {ID=1, KW, SN, ICT, FCT, CCT, LT, EOP, CNULL, CNL};
 
 enum KEYWORDS {
   CLASS = 1, DATA, CODE, INTERN,
-  CHAR, INT, FLOAT, BOOL, VOID, 
+  KW_CHAR, KW_INT, KW_FLOAT, KW_BOOL, KW_VOID, 
   IF, ELSE, WHILE, FOR, 
   RETURN, DELETE, NEW
 };
@@ -65,11 +65,11 @@ static const char * const kwTable[] = {
   [CLASS] = "CLASS",
   [DATA] = "DATA",
   [CODE] = "CODE",
-  [CHAR] = "CHAR",
-  [INT] = "INT",
-  [FLOAT] = "FLOAT",
-  [BOOL] = "BOOL",
-  [VOID] = "VOID",
+  [KW_CHAR] = "CHAR",
+  [KW_INT] = "INT",
+  [KW_FLOAT] = "FLOAT",
+  [KW_BOOL] = "BOOL",
+  [KW_VOID] = "VOID",
   [IF] = "IF",
   [ELSE] = "ELSE",
   [WHILE] = "WHILE",
