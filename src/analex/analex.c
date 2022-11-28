@@ -397,7 +397,7 @@ Token nextToken(FILE *file) {
 
 int findKw(char lexema[]) {
   int i;
-  for (i = 1; i < (sizeof(kwTable)) / (sizeof(kwTable[0])) - 1; i++)
+  for (i = 1; i < (sizeof(kwTable)) / (sizeof(kwTable[0])); i++)
   {
     if (stricmp(lexema, kwTable[i]) == 0) return i;
   }
