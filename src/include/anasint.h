@@ -1,6 +1,6 @@
 #include "../include/analex.h"
 
-#define SYMBOL_ARRAY_OFFSET 31
+#define SYMBOL_ARRAY_OFFSET 100
 typedef struct {
   enum TOKEN_TYPE type;
   int idx;
@@ -15,13 +15,17 @@ enum VAR_TYPE {
 };
 
 enum SYMBOL_STEREOTYPE {
+  STR_UNKNOWN = 0,
   VAR=1, // variable
-  CFN, // function
+  CFN, // code function
   IFN, // intern function
   ARG, // argument
+  GFN, // global function
+  STR_CLASS, // class stereotype
 };
 
 enum SYMBOL_TYPE {
+  SB_VOID = KW_VOID,
   SB_INT = KW_INT,
   SB_CHAR = KW_CHAR,
   SB_FLOAT = KW_FLOAT,
@@ -29,7 +33,8 @@ enum SYMBOL_TYPE {
   SB_INT_ARRAY = KW_INT + SYMBOL_ARRAY_OFFSET,
   SB_CHAR_ARRAY = KW_CHAR + SYMBOL_ARRAY_OFFSET,
   SB_FLOAT_ARRAY = KW_FLOAT + SYMBOL_ARRAY_OFFSET,
-  SB_BOOL_ARRAY = KW_BOOL + SYMBOL_ARRAY_OFFSET
+  SB_BOOL_ARRAY = KW_BOOL + SYMBOL_ARRAY_OFFSET,
+  SB_CLASS = KW_CLASS
 };
 typedef struct {
   int addressOffset;
@@ -49,13 +54,13 @@ void objDef(); // obj_def
 void dataSec(); // data_sec
 void methodSec(); // meth_sec
 void varList(); // decl_list_var
-void decl(); // decl
-void varDecl(); // decl_var
-void type(); // tipo
+void decl(Symbol *sb); // decl
+void varDecl(Symbol *sb); // decl_var
+void type(Symbol *sb); // tipo
 void paramType(); // tipos_param
-void func(); // func
-void funcPrototype(); // func_prot
-void scope(); // escopo
+void func(Symbol *sb); // func
+void funcPrototype(Symbol *sb); // func_prot
+void scope(Symbol *sb); // escopo
 void cmd(); // cmd
 
 void atrib(); // atrib
@@ -66,4 +71,17 @@ void factor(); // fator
 void relationalOp(); // op_rel
 
 // GLOBALS
-const Symbol *symbolTable[1000];
+Symbol symbolTable[1000];
+
+static const char * const symbolTypeNames[] = {
+  [SB_VOID] = "SB_VOID",
+  [SB_INT] =  "SB_INT",
+  [SB_CHAR] =  "SB_CHAR",
+  [SB_FLOAT] =  "SB_FLOAT",
+  [SB_BOOL] =  "SB_BOOL",
+  [SB_INT_ARRAY] =  "SB_INT_ARRAY",
+  [SB_CHAR_ARRAY] =  "SB_CHAR_ARRAY",
+  [SB_FLOAT_ARRAY] =  "SB_FLOAT_ARRAY",
+  [SB_BOOL_ARRAY] =  "SB_BOOL_ARRAY",
+  [SB_CLASS] = "SB_CLASS"
+};

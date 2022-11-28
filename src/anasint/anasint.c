@@ -7,10 +7,10 @@ int symbolTableTop = 0;
 Token getToken();
 void process();
 
-void declFuncAux();
-void funcPostDoubleColon();
+void declFuncAux(Symbol *sb);
+void funcPostDoubleColon(Symbol *sb);
 void funcPostOpBraces();
-void varDeclAux();
+void varDeclAux(Symbol *sb);
 void atribAux();
 void factorPostCircumflex();
 
@@ -22,6 +22,7 @@ int isIdDefined(Token tk);
 void pushToSymbolTable();
 Symbol peekSymbolTable();
 void popSymbolTable();
+void printSymbolTable();
 
 void executeSyntaxAnalysis(FILE *file) {
   fd = file;
@@ -39,12 +40,16 @@ void prog() {
   getToken();
   while (token.type != EOP)
   {
-    if (token.type == KW && token.tableIdx == CLASS) {
+    if (token.type == KW && token.tableIdx == KW_CLASS) {
       process();
       objDef();
     } else if (isTypeOrVoid(token)) {
+      Symbol sb;
+      sb.scope = 0;
+      sb.type = token.tableIdx;
+      sb.stereotype = STR_UNKNOWN;
       process();
-      declFuncAux();
+      declFuncAux(&sb);
     } else {
       syntaxError("Class or type expected");
     }
@@ -52,11 +57,22 @@ void prog() {
     getToken();
   }
   printf("\n--- DEBUG: FINISHED PROG ROUTINE...");
+
+  system("PAUSE");
+  printSymbolTable();
 }
 
 void objDef() { // Class já foi processado
   printf("\n--- DEBUG: EXECUTING OBJDEF ROUTINE...");
   processNextIf(matches(ID, -1));
+
+  Symbol sb;
+  sb.scope = 0;
+  sb.stereotype = STR_CLASS;
+  sb.type = SB_CLASS;
+  strcpy(sb.name, token.lexeme);
+  pushToSymbolTable(sb);
+
   processNextIf(matches(SN, OP_BRACES));
 
   dataSec();
@@ -86,7 +102,11 @@ void methodSec() {
 
   getToken();
   while (isTypeOrVoid(token)) {
-    funcPrototype();
+    Symbol sb;
+    sb.type = token.tableIdx;
+    sb.scope = 0;
+    sb.stereotype = CFN;
+    funcPrototype(&sb);
     getToken();
   }
   if (token.type == KW && token.tableIdx == INTERN) {
@@ -95,7 +115,12 @@ void methodSec() {
 
     getToken();
     while (isTypeOrVoid(token)) {
-      funcPrototype();
+      Symbol sb;
+      sb.type = token.tableIdx;
+      sb.scope = 0;
+      sb.stereotype = IFN;
+
+      funcPrototype(&sb);
       getToken();
     }
   } else {
@@ -110,6 +135,12 @@ void varList() {
   if (!isTypeOrVoid(token)) {
     error("Syntax error");
   }
+
+  Symbol sb;
+  sb.scope = 1;
+  sb.stereotype = VAR;
+  sb.type = token.tableIdx;
+
   process();
   getToken();
 
@@ -119,39 +150,49 @@ void varList() {
   }
 
   if (token.type == ID) {
-    varDecl();
+    varDecl(&sb);
+    pushToSymbolTable(sb);
   } else error("Syntax error");
 
   getToken();
   while (token.type == SN && token.tableIdx == COMMA) {
+    Symbol sb2;
+    sb2.scope = sb.scope;
+    sb2.stereotype = sb.stereotype;
+    sb2.type = sb.type;
+
     process();
     getToken();
     if (token.type == ID) {
-      varDecl();
+      varDecl(&sb2);
     } else if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
       process();
-      varDecl();
+      varDecl(&sb2);
     } else error("Syntax error");
 
     getToken();
+    pushToSymbolTable(sb2);
   }
   printf("\n--- DEBUG: FINISHED VARLIST ROUTINE...");
 }
 
-void varDecl() {
+void varDecl(Symbol *sb) {
   printf("\n--- DEBUG: EXECUTING VARDECL ROUTINE...");
   processNextIf(matches(ID, -1));
-  varDeclAux();
+  strcpy(sb->name, token.lexeme);
+  varDeclAux(sb);
   printf("\n--- DEBUG: FINISHED VARDECL ROUTINE...");
 }
 
-void varDeclAux() {
+void varDeclAux(Symbol *sb) {
   printf("\n--- DEBUG: EXECUTING VARDECLAUX ROUTINE...");
   getToken();
   if (token.type == SN && token.tableIdx == OP_BRACKETS) {
     process();
     processNextIf(matches(ICT, -1));
     processNextIf(matches(SN, CL_BRACKETS));
+
+    sb->type += SYMBOL_ARRAY_OFFSET;
   }
   printf("\n--- DEBUG: FINISHED VARDECLAUX ROUTINE...");
 }
@@ -161,6 +202,11 @@ void paramType() {
   getToken();
 
   while (isTypeOrVoid(token)) {
+    Symbol sb;
+    sb.stereotype = ARG;
+    sb.type = token.tableIdx;
+    sb.scope = 1;
+
     process();
     getToken();
 
@@ -171,23 +217,35 @@ void paramType() {
         process();
       }
       processNextIf(matches(ID, -1));
+
+      strcpy(sb.name, token.lexeme);
+
       getToken();
     }
     else if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
       process();
       processNextIf(matches(ID, -1));
 
+      strcpy(sb.name, token.lexeme);
+
       getToken();
       if (token.type == SN && token.tableIdx == OP_BRACKETS) {
+        sb.type += SYMBOL_ARRAY_OFFSET;
+
         process();
         processNextIf(matches(SN, CL_BRACKETS));
         getToken();
       }
     } else {
       processNextIf(matches(ID, -1));
+
+      strcpy(sb.name, token.lexeme);
+
       getToken();
 
       if (token.type == SN && token.tableIdx == OP_BRACKETS) {
+        sb.type += SYMBOL_ARRAY_OFFSET;
+
         process();
         processNextIf(matches(SN, CL_BRACKETS));
         getToken();
@@ -199,12 +257,14 @@ void paramType() {
       getToken();
       if (!isTypeOrVoid(token)) syntaxError("Type expected");
     }
+
+    pushToSymbolTable(sb);
   }
 
   printf("\n--- DEBUG: FINISHED PARAMTYPE ROUTINE...");
 }
 
-void declFuncAux() { // Tipo já foi processado
+void declFuncAux(Symbol *sb) { // Tipo já foi processado
   printf("\n--- DEBUG: EXECUTING DECLFUNCAUX ROUTINE...");
   getToken();
   if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
@@ -212,12 +272,17 @@ void declFuncAux() { // Tipo já foi processado
   }
 
   processNextIf(matches(ID, -1));
+  strcpy(sb->name, token.lexeme);
   getToken();
   if (token.type == SN && token.tableIdx == DOUBLE_COLON) {
     process();
-    funcPostDoubleColon();
+    sb->stereotype = GFN;
+    funcPostDoubleColon(sb);
   } else if (token.type == SN && token.tableIdx == OP_PARENTHESIS) {
     process();
+    sb->stereotype = GFN;
+    pushToSymbolTable(*sb);
+
     paramType();
     processNextIf(matches(SN, CL_PARENTHESIS));
     getToken();
@@ -228,45 +293,66 @@ void declFuncAux() { // Tipo já foi processado
       process();
       do {
         processNextIf(matches(ID, -1));
+
+        Symbol sb2;
+        sb2.scope = sb->scope;
+        sb2.type = sb->type;
+        sb2.stereotype = sb->stereotype;
+        strcpy(sb2.name, token.lexeme);
+        pushToSymbolTable(sb2);
+
         processNextIf(matches(SN, OP_PARENTHESIS));
         paramType();
         processNextIf(matches(SN, CL_PARENTHESIS));
         getToken();
       } while (token.type == SN && token.tableIdx == COMMA);
-      processNextIf(matches(SN, SEMI_COLON)); // TODO test
+      processNextIf(matches(SN, SEMI_COLON));
     } else {
-      processNextIf(matches(SN, SEMI_COLON)); // TODO test
+      processNextIf(matches(SN, SEMI_COLON));
     }
-    
-  } else if (token.type == SN && token.tableIdx == OP_BRACES) {
-    process();
-    varDeclAux();
   } else if (token.type == SN && token.tableIdx == COMMA) {
+    if (sb->stereotype == 0) {
+      sb->stereotype = VAR;
+      pushToSymbolTable(*sb);
+    }
+
     do {
+      Symbol sb2;
+      sb2.scope = sb->scope;
+      sb2.type = sb->type;
+      sb2.stereotype = VAR;
       process();
       getToken();
       if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
         process();
       }
-      varDecl();
+      varDecl(&sb2);
+      pushToSymbolTable(sb2);
     } while (token.type == SN && token.tableIdx == COMMA);
-    processNextIf(matches(SN, SEMI_COLON)); // TODO test
+    processNextIf(matches(SN, SEMI_COLON));
   } else if(token.type == SN && token.tableIdx == OP_BRACKETS) {
+    sb->stereotype = VAR;
+    sb->type += SYMBOL_ARRAY_OFFSET;
+    pushToSymbolTable(*sb);
+
     process();
     processNextIf(matches(ICT, -1));
     processNextIf(matches(SN, CL_BRACKETS));
-    processNextIf(matches(SN, SEMI_COLON)); // TODO test
+    processNextIf(matches(SN, SEMI_COLON));
   }
   else {
-    processNextIf(matches(SN, SEMI_COLON)); // TODO test
+    processNextIf(matches(SN, SEMI_COLON));
+    pushToSymbolTable(*sb);
   }
   printf("\n--- DEBUG: FINISHED DECLFUNCAUX ROUTINE...");  
 }
 
-void funcPostDoubleColon() {
+void funcPostDoubleColon(Symbol *sb) {
   printf("\n--- DEBUG: EXECUTING FUNCPOSTDOUBLECOLON ROUTINE...");
   processNextIf(matches(ID, -1));
+  strcpy(sb->name, token.lexeme);
   processNextIf(matches(SN, OP_PARENTHESIS));
+  pushToSymbolTable(*sb);
   paramType();
   processNextIf(matches(SN, CL_PARENTHESIS));
   processNextIf(matches(SN, OP_BRACES));
@@ -292,12 +378,15 @@ void funcPostOpBraces() {
   printf("\n--- DEBUG: FINISHED FUNCPOSTOPBRACES ROUTINE...");
 }
 
-void funcPrototype() {
+void funcPrototype(Symbol *sb) {
   printf("\n--- DEBUG: EXECUTING FUNCPROTOTYPE ROUTINE...");
   getToken();
   if (!isTypeOrVoid(token)) {
     error("Syntax error");
   }
+
+  sb->type = token.tableIdx;
+
   process();
   getToken();
 
@@ -306,6 +395,10 @@ void funcPrototype() {
   }
 
   processNextIf(matches(ID, -1));
+
+  strcpy(sb->name, token.lexeme);
+  pushToSymbolTable(*sb);
+
   processNextIf(matches(SN, OP_PARENTHESIS));
   paramType();
   processNextIf(matches(SN, CL_PARENTHESIS));
@@ -455,16 +548,19 @@ void atrib() {//primeiro '[' já processado
 }
 
 void atribAux() {//até '=' já foi processado
+  printf("\n--- DEBUG: EXECUTING ATRIBAUX ROUTINE...");
   getToken();
   if (token.type == KW && token.tableIdx == NEW) {
     process();
     getToken();
-    if (!isTypeOrVoid(token)) {
-      syntaxError("Type expected");
-    }
+    if (isTypeOrVoid(token)) {
+      process();
+    } else syntaxError("Type expected");
   } else if (isExprStart(token)) {
     expr();
   } else syntaxError("Syntax error: keyword or expression expected");
+
+  printf("\n--- DEBUG: FINISHED ATRIBAUX ROUTINE...");
 }
 
 void expr() {
@@ -634,9 +730,9 @@ int isTypeOrVoid(Token tk) {
     tk.tableIdx == VOID_TYPE
   );
 
-  // int isUserDefinedType = isIdDefined(tk);
+  int isUserDefinedType = isIdDefined(tk);
 
-  return isPrimitiveType;
+  return isPrimitiveType || isUserDefinedType;
 }
 
 int isIdDefined(Token tk) {
@@ -645,7 +741,7 @@ int isIdDefined(Token tk) {
   int i;
   for (i = 1; i < (sizeof(symbolTable)) / (sizeof(symbolTable[0])) - 1; i++)
   {
-    if (stricmp(tk.lexeme, symbolTable[i]->name) == 0) return 1;
+    if (stricmp(tk.lexeme, symbolTable[i].name) == 0) return 1;
   }
 
   return 0;
@@ -690,13 +786,22 @@ void process() {
  -----------------------*/
 
 void pushToSymbolTable(Symbol sb) {
-  symbolTable[symbolTableTop++] = &sb;
+  printf("\n------------ DEBUG: PUSHING TO SYMBOL TABLE [%d]: %s - %s", symbolTableTop, symbolTypeNames[sb.type], sb.name);
+  symbolTable[symbolTableTop] = sb;
+  symbolTableTop++;
 }
 
 Symbol peekSymbolTable() {
-  return *symbolTable[symbolTableTop];
+  return symbolTable[symbolTableTop];
 }
 
 void popSymbolTable() {
-  symbolTable[symbolTableTop--] = NULL;
+  symbolTableTop--;
+}
+
+void printSymbolTable() {
+  int i;
+  for (i = 0; i < symbolTableTop; i++) {
+    printf("\n--- DEBUG: SYMBOL TABLE [%d] = %s - %s", i, symbolTypeNames[symbolTable[i].type], symbolTable[i].name);
+  }
 }
