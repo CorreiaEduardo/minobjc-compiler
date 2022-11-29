@@ -276,7 +276,6 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
   getToken();
   if (token.type == SN && token.tableIdx == DOUBLE_COLON) {
     process();
-    sb->stereotype = GFN;
     funcPostDoubleColon(sb);
   } else if (token.type == SN && token.tableIdx == OP_PARENTHESIS) {
     process();
@@ -350,9 +349,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
 void funcPostDoubleColon(Symbol *sb) {
   printf("\n--- DEBUG: EXECUTING FUNCPOSTDOUBLECOLON ROUTINE...");
   processNextIf(matches(ID, -1));
-  strcpy(sb->name, token.lexeme);
   processNextIf(matches(SN, OP_PARENTHESIS));
-  pushToSymbolTable(*sb);
   paramType();
   processNextIf(matches(SN, CL_PARENTHESIS));
   processNextIf(matches(SN, OP_BRACES));
