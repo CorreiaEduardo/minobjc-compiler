@@ -17,6 +17,8 @@ Token nextToken(FILE *file) {
   char lexeme[LEXEME_MAX_LENGTH] = {'\0'}, number[NUMBER_MAX_LENGTH] = {'\0'}, literal[LT_MAX_LENGTH] = {'\0'};
 
   Token nextToken;
+  nextToken.processed = 0;
+
   while(1) {
     char c = fgetc(file);
     
