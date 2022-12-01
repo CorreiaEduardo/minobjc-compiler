@@ -1,6 +1,5 @@
 #include "../include/analex.h"
 
-#define SYMBOL_ARRAY_OFFSET 100
 typedef struct {
   enum TOKEN_TYPE type;
   int idx;
@@ -25,15 +24,12 @@ enum SYMBOL_STEREOTYPE {
 };
 
 enum SYMBOL_TYPE {
+  SB_UNKNOWN = -1,
   SB_VOID = KW_VOID,
   SB_INT = KW_INT,
   SB_CHAR = KW_CHAR,
   SB_FLOAT = KW_FLOAT,
   SB_BOOL = KW_BOOL,
-  SB_INT_ARRAY = KW_INT + SYMBOL_ARRAY_OFFSET,
-  SB_CHAR_ARRAY = KW_CHAR + SYMBOL_ARRAY_OFFSET,
-  SB_FLOAT_ARRAY = KW_FLOAT + SYMBOL_ARRAY_OFFSET,
-  SB_BOOL_ARRAY = KW_BOOL + SYMBOL_ARRAY_OFFSET,
   SB_CLASS = KW_CLASS
 };
 typedef struct {
@@ -42,6 +38,9 @@ typedef struct {
   int scope; // 0 = global
   enum SYMBOL_TYPE type;
   enum SYMBOL_STEREOTYPE stereotype;
+  int isArray;
+  int isPointer;
+  int forceReference;
 } Symbol;
 
 void executeSyntaxAnalysis(FILE *file);
@@ -79,9 +78,5 @@ static const char * const symbolTypeNames[] = {
   [SB_CHAR] =  "SB_CHAR",
   [SB_FLOAT] =  "SB_FLOAT",
   [SB_BOOL] =  "SB_BOOL",
-  [SB_INT_ARRAY] =  "SB_INT_ARRAY",
-  [SB_CHAR_ARRAY] =  "SB_CHAR_ARRAY",
-  [SB_FLOAT_ARRAY] =  "SB_FLOAT_ARRAY",
-  [SB_BOOL_ARRAY] =  "SB_BOOL_ARRAY",
   [SB_CLASS] = "SB_CLASS"
 };

@@ -18,6 +18,7 @@ int isCmdStart(Token tk);
 int isRelationalOperator(Token tk);
 int isExprStart(Token tk);
 
+Symbol createSymbol();
 int isIdDefined(Token tk);
 void pushToSymbolTable();
 Symbol peekSymbolTable();
@@ -44,10 +45,9 @@ void prog() {
       process();
       objDef();
     } else if (isTypeOrVoid(token)) {
-      Symbol sb;
+      Symbol sb = createSymbol();
       sb.scope = 0;
       sb.type = token.tableIdx;
-      sb.stereotype = STR_UNKNOWN;
       process();
       declFuncAux(&sb);
     } else {
@@ -66,7 +66,7 @@ void objDef() { // Class já foi processado
   printf("\n--- DEBUG: EXECUTING OBJDEF ROUTINE...");
   processNextIf(matches(ID, -1));
 
-  Symbol sb;
+  Symbol sb = createSymbol();
   sb.scope = 0;
   sb.stereotype = STR_CLASS;
   sb.type = SB_CLASS;
@@ -102,7 +102,7 @@ void methodSec() {
 
   getToken();
   while (isTypeOrVoid(token)) {
-    Symbol sb;
+    Symbol sb = createSymbol();
     sb.type = token.tableIdx;
     sb.scope = 0;
     sb.stereotype = CFN;
@@ -115,7 +115,7 @@ void methodSec() {
 
     getToken();
     while (isTypeOrVoid(token)) {
-      Symbol sb;
+      Symbol sb = createSymbol();
       sb.type = token.tableIdx;
       sb.scope = 0;
       sb.stereotype = IFN;
@@ -136,7 +136,7 @@ void varList() {
     error("Syntax error");
   }
 
-  Symbol sb;
+  Symbol sb = createSymbol();
   sb.scope = 1;
   sb.stereotype = VAR;
   sb.type = token.tableIdx;
@@ -145,6 +145,8 @@ void varList() {
   getToken();
 
   if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
+    sb.isPointer = 1;
+
     process();
     getToken();
   }
@@ -166,6 +168,7 @@ void varList() {
     if (token.type == ID) {
       varDecl(&sb2);
     } else if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
+      sb2.isPointer = 1;
       process();
       varDecl(&sb2);
     } else error("Syntax error");
@@ -192,7 +195,7 @@ void varDeclAux(Symbol *sb) {
     processNextIf(matches(ICT, -1));
     processNextIf(matches(SN, CL_BRACKETS));
 
-    sb->type += SYMBOL_ARRAY_OFFSET;
+    sb->isArray = 1;
   }
   printf("\n--- DEBUG: FINISHED VARDECLAUX ROUTINE...");
 }
@@ -202,7 +205,7 @@ void paramType() {
   getToken();
 
   while (isTypeOrVoid(token)) {
-    Symbol sb;
+    Symbol sb = createSymbol();
     sb.stereotype = ARG;
     sb.type = token.tableIdx;
     sb.scope = 1;
@@ -211,9 +214,12 @@ void paramType() {
     getToken();
 
     if (token.type == SN && token.tableIdx == AMP) {
+      sb.forceReference = 1;
+
       process();
       getToken();
       if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
+        sb.isPointer = 1;
         process();
       }
       processNextIf(matches(ID, -1));
@@ -223,6 +229,8 @@ void paramType() {
       getToken();
     }
     else if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
+      sb.isPointer = 1;
+
       process();
       processNextIf(matches(ID, -1));
 
@@ -230,7 +238,7 @@ void paramType() {
 
       getToken();
       if (token.type == SN && token.tableIdx == OP_BRACKETS) {
-        sb.type += SYMBOL_ARRAY_OFFSET;
+        sb.isArray = 1;
 
         process();
         processNextIf(matches(SN, CL_BRACKETS));
@@ -244,7 +252,7 @@ void paramType() {
       getToken();
 
       if (token.type == SN && token.tableIdx == OP_BRACKETS) {
-        sb.type += SYMBOL_ARRAY_OFFSET;
+        sb.isArray = 1;
 
         process();
         processNextIf(matches(SN, CL_BRACKETS));
@@ -268,6 +276,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
   printf("\n--- DEBUG: EXECUTING DECLFUNCAUX ROUTINE...");
   getToken();
   if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
+    sb->isPointer = 1;
     process();
   }
 
@@ -323,6 +332,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
       process();
       getToken();
       if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
+        sb2.isPointer = 1;
         process();
       }
       varDecl(&sb2);
@@ -331,7 +341,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
     processNextIf(matches(SN, SEMI_COLON));
   } else if(token.type == SN && token.tableIdx == OP_BRACKETS) {
     sb->stereotype = VAR;
-    sb->type += SYMBOL_ARRAY_OFFSET;
+    sb->isArray = 1;
     pushToSymbolTable(*sb);
 
     process();
@@ -388,6 +398,7 @@ void funcPrototype(Symbol *sb) {
   getToken();
 
   if (token.type == SN && token.tableIdx == CIRCUMFLEX) {
+    sb->isPointer = 1;
     process();
   }
 
@@ -781,6 +792,17 @@ void process() {
 /*----------------------
  |  Symbol table related
  -----------------------*/
+
+Symbol createSymbol() {
+  Symbol sb;
+  sb.type = SB_UNKNOWN;
+  sb.stereotype = STR_UNKNOWN;
+  sb.forceReference = 0;
+  sb.isArray = 0;
+  sb.isPointer = 0;
+
+  return sb;
+}
 
 void pushToSymbolTable(Symbol sb) {
   printf("\n------------ DEBUG: PUSHING TO SYMBOL TABLE [%d]: %s - %s", symbolTableTop, symbolTypeNames[sb.type], sb.name);
