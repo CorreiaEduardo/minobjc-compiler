@@ -12,7 +12,7 @@ class a {
 }
 
 int o, pq;
-float rs();
+float rs(bool zzzz);
 float t(), u();
 char v[2];
 

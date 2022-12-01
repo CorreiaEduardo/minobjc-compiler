@@ -20,6 +20,7 @@ enum SYMBOL_STEREOTYPE {
   IFN, // intern function
   ARG, // argument
   GFN, // global function
+  FIMP, // function implementation
   STR_CLASS, // class stereotype
 };
 
@@ -43,6 +44,12 @@ typedef struct {
   int forceReference;
 } Symbol;
 
+enum PUSH_BEHAVIOR {
+  NO_PUSH = 0,
+  SBT_PUSH,
+  TPT_PUSH
+};
+
 void executeSyntaxAnalysis(FILE *file);
 TokenMatcher matches(enum TOKEN_TYPE type, int idx);
 Token processNextIf(TokenMatcher matcher);
@@ -52,11 +59,11 @@ void prog(); // prog
 void objDef(); // obj_def
 void dataSec(); // data_sec
 void methodSec(); // meth_sec
-void varList(); // decl_list_var
+void varList(enum PUSH_BEHAVIOR pushBehavior); // decl_list_var
 void decl(Symbol *sb); // decl
 void varDecl(Symbol *sb); // decl_var
 void type(Symbol *sb); // tipo
-void paramType(); // tipos_param
+void paramType(enum PUSH_BEHAVIOR pushBehavior); // tipos_param
 void func(Symbol *sb); // func
 void funcPrototype(Symbol *sb); // func_prot
 void scope(Symbol *sb); // escopo
@@ -72,6 +79,8 @@ void relationalOp(); // op_rel
 // GLOBALS
 Symbol symbolTable[1000];
 
+Symbol typeTable[1000];
+
 static const char * const symbolTypeNames[] = {
   [SB_VOID] = "SB_VOID",
   [SB_INT] =  "SB_INT",
@@ -79,4 +88,15 @@ static const char * const symbolTypeNames[] = {
   [SB_FLOAT] =  "SB_FLOAT",
   [SB_BOOL] =  "SB_BOOL",
   [SB_CLASS] = "SB_CLASS"
+};
+
+static const char * const symbolStereotypeNames[] = {
+  [STR_UNKNOWN] = "STR_UNKNOWN",
+  [VAR] = "VAR",
+  [CFN] = "CFN",
+  [IFN] = "IFN",
+  [ARG] = "ARG",
+  [GFN] = "GFN",
+  [STR_CLASS] = "STR_CLASS",
+  [FIMP] = "FIMP"
 };
