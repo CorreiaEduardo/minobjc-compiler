@@ -372,8 +372,14 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
 void funcPostDoubleColon(Symbol *sb) {
   printf("\n--- DEBUG: EXECUTING FUNCPOSTDOUBLECOLON ROUTINE...");
   processNextIf(matches(ID, -1));
+
+  sb->stereotype = SFN;
+  strcpy(sb->fnScope, sb->name);
+  strcpy(sb->name, token.lexeme);
+  pushToSymbolTable(*sb);
+
   processNextIf(matches(SN, OP_PARENTHESIS));
-  paramType(NO_PUSH);
+  paramType(SBT_PUSH);
   processNextIf(matches(SN, CL_PARENTHESIS));
   processNextIf(matches(SN, OP_BRACES));
   funcPostOpBraces(NULL);

@@ -45,12 +45,13 @@ typedef struct {
 
 enum SYMBOL_STEREOTYPE {
   STR_UNKNOWN = 0,
-  VAR=1, // variable
+  VAR, // variable
+  GFN, // global function
   CFN, // code function
   IFN, // intern function
-  ARG, // argument
-  GFN, // global function
+  SFN, // scoped function implementation
   FIMP, // function implementation
+  ARG, // argument
   STR_CLASS, // class stereotype
 };
 
@@ -81,18 +82,22 @@ static const char * const symbolStereotypeNames[] = {
   [ARG] = "ARG",
   [GFN] = "GFN",
   [STR_CLASS] = "STR_CLASS",
-  [FIMP] = "FIMP"
+  [FIMP] = "FIMP",
+  [SFN] = "SFN"
 };
 
 typedef struct {
   int addressOffset;
   char name[LEXEME_MAX_LENGTH];
-  int scope; // 0 = global
   enum SYMBOL_TYPE type;
   enum SYMBOL_STEREOTYPE stereotype;
   int isArray;
   int isPointer;
   int forceReference;
+  union {
+    int scope; // 0 = global
+    char fnScope[LEXEME_MAX_LENGTH];
+  };
 } Symbol;
 
 enum PUSH_BEHAVIOR {
