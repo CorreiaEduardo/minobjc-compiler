@@ -2,8 +2,6 @@
 
 FILE *fd;
 Token token;
-int symbolTableTop = 0;
-int typeTableTop = 0;
 
 Token getToken();
 void process();
@@ -20,15 +18,6 @@ int isRelationalOperator(Token tk);
 int isExprStart(Token tk);
 
 Symbol createSymbol();
-int isIdDefined(Token tk);
-void pushToSymbolTable(Symbol sb);
-Symbol peekSymbolTable();
-void popSymbolTable();
-void printSymbolTable();
-Symbol *findInSymbolTable(char lexeme[]);
-
-void printTypeTable();
-void pushToTypeTable(Symbol sb);
 
 void executeSyntaxAnalysis(FILE *file) {
   fd = file;
@@ -722,6 +711,14 @@ Token getToken() {
   return token;
 }
 
+TokenMatcher matches(enum TOKEN_TYPE type, int idx) {
+  TokenMatcher matcher;
+  matcher.type = type;
+  matcher.idx = idx;
+
+  return matcher;
+}
+
 Token processNextIf(TokenMatcher matcher) {
   getToken();
   printf("    --- DEBUG: CONDITIONAL PROCESSING WITH: type = %d AND idx = %d", matcher.type, matcher.idx);
@@ -747,12 +744,10 @@ Token processNextIf(TokenMatcher matcher) {
   process();
 }
 
-TokenMatcher matches(enum TOKEN_TYPE type, int idx) {
-  TokenMatcher matcher;
-  matcher.type = type;
-  matcher.idx = idx;
-
-  return matcher;
+void process() {
+  printf("\n    --- DEBUG: PROCESSED TOKEN: ");
+  token.processed = 1;
+  printToken(token);
 }
 
 void syntaxError(char message[]) {
@@ -771,18 +766,6 @@ int isTypeOrVoid(Token tk) {
   int isUserDefinedType = isIdDefined(tk);
 
   return isPrimitiveType || isUserDefinedType;
-}
-
-int isIdDefined(Token tk) {
-  if (tk.type != ID) return 0;
-  
-  int i;
-  for (i = 1; i < (sizeof(typeTable)) / (sizeof(typeTable[0])) - 1; i++)
-  {
-    if (stricmp(tk.lexeme, typeTable[i].name) == 0) return 1;
-  }
-
-  return 0;
 }
 
 int isCmdStart(Token tk) {
@@ -813,12 +796,6 @@ int isExprStart(Token tk) {
   || tk.type == CCT);
 }
 
-void process() {
-  printf("\n    --- DEBUG: PROCESSED TOKEN: ");
-  token.processed = 1;
-  printToken(token);
-}
-
 /*----------------------
  |  Symbol table related
  -----------------------*/
@@ -832,45 +809,4 @@ Symbol createSymbol() {
   sb.isPointer = 0;
 
   return sb;
-}
-
-void pushToSymbolTable(Symbol sb) {
-  printf("\n------------ DEBUG: PUSHING TO SYMBOL TABLE [%s]: %s - %s", symbolTypeNames[sb.type], symbolStereotypeNames[sb.stereotype], sb.name);
-  symbolTable[symbolTableTop] = sb;
-  symbolTableTop++;
-}
-
-Symbol peekSymbolTable() {
-  return symbolTable[symbolTableTop];
-}
-
-void popSymbolTable() {
-  symbolTableTop--;
-}
-
-void printSymbolTable() {
-  int i;
-  for (i = symbolTableTop - 1; i >= 0; i--) {
-    printf("\n--- DEBUG: SYMBOL TABLE [%s] = %s - %s", symbolTypeNames[symbolTable[i].type], symbolStereotypeNames[symbolTable[i].stereotype], symbolTable[i].name);
-  }
-}
-
-Symbol *findInSymbolTable(char lexeme[]) {
-  int i;
-  for (i = symbolTableTop - 1; i >= 0; i--) {
-    if (stricmp(symbolTable[i].name, lexeme) == 0) return &symbolTable[i];
-  }
-}
-
-void pushToTypeTable(Symbol sb) {
-  printf("\n------------ DEBUG: PUSHING TO TYPE TABLE [%s]: %s - %s", symbolTypeNames[sb.type], symbolStereotypeNames[sb.stereotype], sb.name);
-  typeTable[typeTableTop] = sb;
-  typeTableTop++;
-}
-
-void printTypeTable() {
-  int i;
-  for (i = typeTableTop - 1; i >= 0; i--) {
-    printf("\n--- DEBUG: TYPE TABLE [%s] = %s - %s", symbolTypeNames[typeTable[i].type], symbolStereotypeNames[typeTable[i].stereotype], typeTable[i].name);
-  }
 }

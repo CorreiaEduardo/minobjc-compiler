@@ -1,9 +1,8 @@
-#include "../include/util.h"
+#include "../include/core.h"
 
 #ifndef ANALEX_H
 
 #define ANALEX_H
-#define LEXEME_MAX_LENGTH 31
 #define NUMBER_MAX_LENGTH 1000
 #define LT_MAX_LENGTH 1000
 
@@ -16,27 +15,6 @@
 * escaped_char = \n, \0
 * symbol = ; : _ , . {  } (  ) [  ] +  -  *  /  &&  || !  ==  !=  <=  <  >=  >
 */
-
-/*
-* ID: Identificador
-* KW: Keyword, ou Palavra Reservada
-* SN: Sign, ou Sinal
-* ICT: Constante numérica
-* FCT: Constante numérica
-* CCT: Constante caracter
-* LT: Literal, ou cadeia de caracter
-* EOP: End of program
-* CNULL: CCT com valor igual a '\0'
-* CNL: CCT com valor igual a \n
-*/
-enum TOKEN_TYPE {ID=1, KW, SN, ICT, FCT, CCT, LT, EOP, CNULL, CNL};
-
-enum KEYWORDS {
-  KW_CLASS = 1, DATA, CODE, INTERN,
-  KW_CHAR, KW_INT, KW_FLOAT, KW_BOOL, KW_VOID, 
-  IF, ELSE, WHILE, FOR, 
-  RETURN, DELETE, NEW
-};
 
 enum SIGNS {
   SEMI_COLON = 1, COLON, UNDERSCORE, // ;, :, _
@@ -113,19 +91,6 @@ static const char * const signTable[] = {
   [PIPE] = "PIPE",
   [EQ] = "EQ",
 };
-
-typedef struct {
-  enum TOKEN_TYPE type;
-  int processed;
-  union {
-    char lexeme[LEXEME_MAX_LENGTH]; //ID
-    int tableIdx; //KW, SN, LT
-    int integerVal; // ICT
-    float floatVal; // FCT
-    char charVal; // CCT
-  };
-  
-} Token;
 
 // GLOBALS
 const char *literalTable[1000];
