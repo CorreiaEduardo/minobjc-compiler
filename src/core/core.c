@@ -3,6 +3,9 @@
 int symbolTableTop = 0;
 int typeTableTop = 0;
 
+int isLocalScopeDelimiter(Symbol sb);
+int isFunction(Symbol sb);
+
 int isIdDefined(Token tk) {
   if (tk.type != ID) return 0;
   
@@ -43,6 +46,17 @@ Symbol *findInSymbolTable(char lexeme[]) {
   }
 }
 
+int existInSymbolTable(char lexeme[], int scope) {
+  int i, count = 0;
+
+  for (i = symbolTableTop - 1; i >= 0; i--) {
+    if (scope == LOCAL_SCOPE && isLocalScopeDelimiter(symbolTable[i])) break;
+    if ((stricmp(symbolTable[i].name, lexeme) == 0) && symbolTable[i].scope == scope) count++;
+  }
+
+  return count > 0;
+}
+
 void pushToTypeTable(Symbol sb) {
   printf("\n------------ DEBUG: PUSHING TO TYPE TABLE [%s]: %s - %s", symbolTypeNames[sb.type], symbolStereotypeNames[sb.stereotype], sb.name);
   typeTable[typeTableTop] = sb;
@@ -54,6 +68,25 @@ void printTypeTable() {
   for (i = typeTableTop - 1; i >= 0; i--) {
     printf("\n--- DEBUG: TYPE TABLE [%s] = %s - %s", symbolTypeNames[typeTable[i].type], symbolStereotypeNames[typeTable[i].stereotype], typeTable[i].name);
   }
+}
+
+int existInTypeTable(char lexeme[], int scope) {
+  int i, count = 0;
+
+  for (i = typeTableTop - 1; i >= 0; i--) {
+    if (scope == LOCAL_SCOPE && isLocalScopeDelimiter(typeTable[i])) break;
+    if ((stricmp(typeTable[i].name, lexeme) == 0) && typeTable[i].scope == scope) count++;
+  }
+
+  return count > 0;
+}
+
+int isLocalScopeDelimiter(Symbol sb) {
+  return sb.stereotype == STR_CLASS || isFunction(sb);
+}
+
+int isFunction(Symbol sb) {
+  return sb.stereotype == FIMP || sb.stereotype == GFN || sb.stereotype == CFN || sb.stereotype == IFN || sb.stereotype == SFN;
 }
 
 void error(char msg[]) { 

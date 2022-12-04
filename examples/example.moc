@@ -30,6 +30,7 @@ float x() {
 float ^y::z() {}
 
 float ^aa::bb(bool cc) {
+  float b;
   dd = 1 + 5;
   zdd = new a;
 }

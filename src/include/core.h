@@ -115,15 +115,18 @@ void popSymbolTable();
 Symbol peekSymbolTable();
 Symbol *findInSymbolTable(char lexeme[]);
 void printSymbolTable();
+int existInSymbolTable(char lexeme[], int scope);
 
 void pushToTypeTable(Symbol sb);
 void printTypeTable();
+int existInTypeTable(char lexeme[], int scope);
 
 int isIdDefined(Token tk);
 
 // GLOBALS
 Symbol symbolTable[1000];
 Symbol typeTable[1000];
-
+static const int GLOBAL_SCOPE = 0;
+static const int LOCAL_SCOPE = 1;
 
 #endif /* CORE_H */

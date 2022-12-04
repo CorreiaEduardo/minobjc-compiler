@@ -1,6 +1,6 @@
 #include "include/anasint.h"
 
-static const char INPUT_FILE[] = "../examples/anasint.moc";
+static const char INPUT_FILE[] = "../examples/example.moc";
 
 void analex() {
   FILE *fd;

@@ -1,4 +1,5 @@
 #include "../include/analex.h"
+#include "../include/anasem.h"
 
 typedef struct {
   enum TOKEN_TYPE type;

@@ -66,6 +66,7 @@ void objDef() { // Class já foi processado
   sb.stereotype = STR_CLASS;
   sb.type = SB_CLASS;
   strcpy(sb.name, token.lexeme);
+  validateDeclaration(sb);
   pushToTypeTable(sb);
 
   processNextIf(matches(SN, OP_BRACES));
@@ -149,8 +150,10 @@ void varList(enum PUSH_BEHAVIOR pushBehavior) {
   if (token.type == ID) {
     varDecl(&sb);
     if (pushBehavior == SBT_PUSH) {
+      validateDeclaration(sb);
       pushToSymbolTable(sb);
     } else if (pushBehavior == TPT_PUSH) {
+      validateDeclaration(sb);
       pushToTypeTable(sb);
     }
     
@@ -175,8 +178,10 @@ void varList(enum PUSH_BEHAVIOR pushBehavior) {
 
     getToken();
     if (pushBehavior == SBT_PUSH) {
+      validateDeclaration(sb2);
       pushToSymbolTable(sb2);
     } else if (pushBehavior == TPT_PUSH) {
+      validateDeclaration(sb2);
       pushToTypeTable(sb2);
     }
     
@@ -272,8 +277,10 @@ void paramType(enum PUSH_BEHAVIOR pushBehavior) {
     }
 
     if (pushBehavior == SBT_PUSH) {
+      validateDeclaration(sb);
       pushToSymbolTable(sb);  
     } else if (pushBehavior == TPT_PUSH) {
+      validateDeclaration(sb);
       pushToTypeTable(sb);
     }
   }
@@ -298,6 +305,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
   } else if (token.type == SN && token.tableIdx == OP_PARENTHESIS) {
     process();
     sb->stereotype = GFN;
+    validateDeclaration(*sb);
     pushToSymbolTable(*sb);
 
     paramType(SBT_PUSH);
@@ -316,6 +324,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
         sb2.type = sb->type;
         sb2.stereotype = sb->stereotype;
         strcpy(sb2.name, token.lexeme);
+        validateDeclaration(sb2);
         pushToSymbolTable(sb2);
 
         processNextIf(matches(SN, OP_PARENTHESIS));
@@ -330,6 +339,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
   } else if (token.type == SN && token.tableIdx == COMMA) {
     if (sb->stereotype == 0) {
       sb->stereotype = VAR;
+      validateDeclaration(*sb);
       pushToSymbolTable(*sb);
     }
 
@@ -345,12 +355,14 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
         process();
       }
       varDecl(&sb2);
+      validateDeclaration(sb2);
       pushToSymbolTable(sb2);
     } while (token.type == SN && token.tableIdx == COMMA);
     processNextIf(matches(SN, SEMI_COLON));
   } else if(token.type == SN && token.tableIdx == OP_BRACKETS) {
     sb->stereotype = VAR;
     sb->isArray = 1;
+    validateDeclaration(*sb);
     pushToSymbolTable(*sb);
 
     process();
@@ -364,6 +376,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
     }
 
     processNextIf(matches(SN, SEMI_COLON));
+    validateDeclaration(*sb);
     pushToSymbolTable(*sb);
   }
   printf("\n--- DEBUG: FINISHED DECLFUNCAUX ROUTINE...");  
@@ -376,6 +389,7 @@ void funcPostDoubleColon(Symbol *sb) {
   sb->stereotype = SFN;
   strcpy(sb->fnScope, sb->name);
   strcpy(sb->name, token.lexeme);
+  validateDeclaration(*sb);
   pushToSymbolTable(*sb);
 
   processNextIf(matches(SN, OP_PARENTHESIS));
@@ -430,6 +444,7 @@ void funcPrototype(Symbol *sb) {
   processNextIf(matches(ID, -1));
 
   strcpy(sb->name, token.lexeme);
+  validateDeclaration(*sb);
   pushToTypeTable(*sb);
 
   processNextIf(matches(SN, OP_PARENTHESIS));
