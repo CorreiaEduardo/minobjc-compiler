@@ -12,6 +12,7 @@ void funcPostOpBraces(char funcName[]);
 void varDeclAux(Symbol *sb);
 void atribAux();
 void factorPostCircumflex();
+void atribPostOpBraces();
 
 int isCmdStart(Token tk);
 int isRelationalOperator(Token tk);
@@ -300,6 +301,8 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
   strcpy(sb->name, token.lexeme);
   getToken();
   if (token.type == SN && token.tableIdx == DOUBLE_COLON) {
+    validateReferenceInTypeTable(sb->name);
+
     process();
     funcPostDoubleColon(sb);
   } else if (token.type == SN && token.tableIdx == OP_PARENTHESIS) {
@@ -504,14 +507,17 @@ void cmd() {
     } else if (token.tableIdx == DELETE) {
       process();
       processNextIf(matches(ID, -1));
+      validateReferenceInSymbolTable(token.lexeme);
       processNextIf(matches(SN, SEMI_COLON));
     }
   } else if (token.type == SN) {
     if (token.tableIdx == CIRCUMFLEX) {
       process();
       processNextIf(matches(ID, -1));
+      validateReferenceInSymbolTable(token.lexeme);
       processNextIf(matches(SN, DOT));
       processNextIf(matches(ID, -1));
+      validateReferenceInSymbolTable(token.lexeme); // TODO validate function call
       processNextIf(matches(SN, OP_PARENTHESIS));
       getToken();
       if (isExprStart(token)) {
@@ -540,6 +546,7 @@ void cmd() {
     }
   } else if (token.type == ID) {
     process();
+    validateReferenceInSymbolTable(token.lexeme);
     getToken();
     if (token.type == SN) {
       if (token.tableIdx == DOT){
@@ -574,7 +581,7 @@ void cmd() {
         processNextIf(matches(SN, SEMI_COLON));
       } else if (token.tableIdx == OP_BRACES) {
         process();
-        atrib();
+        atribPostOpBraces();
         processNextIf(matches(SN, SEMI_COLON));
       } else if (token.tableIdx == EQ) {
         process();
@@ -586,7 +593,17 @@ void cmd() {
   printf("\n--- DEBUG: FINISHED CMD ROUTINE...");
 }
 
-void atrib() {//primeiro '[' já processado
+void atrib() {
+  processNextIf(matches(ID, -1));
+  validateReferenceInSymbolTable(token.lexeme);
+  getToken();
+  if (token.type == SN && token.tableIdx == OP_BRACES) {
+    process();
+    atribPostOpBraces();
+  }
+}
+
+void atribPostOpBraces() {//primeiro '[' já processado
   printf("\n--- DEBUG: EXECUTING ATRIB ROUTINE...");
   expr();
   processNextIf(matches(SN, CL_BRACES));
@@ -675,11 +692,13 @@ void factor() {
 
 void factorPostCircumflex() {
   processNextIf(matches(ID, -1));
+  validateReferenceInSymbolTable(token.lexeme);
   getToken();
   if (token.type == SN) {
     if (token.tableIdx == DOT) {
       process();
       processNextIf(matches(ID, -1));
+      validateReferenceInSymbolTable(token.lexeme);
       getToken();
       if (token.type == SN) {
         if (token.tableIdx == OP_BRACKETS) {

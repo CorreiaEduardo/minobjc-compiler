@@ -17,6 +17,7 @@ float t(), u();
 char v[2];
 
 float x() {
+  int as, a, i;
   float b;
   if(as!=b) {
   ;
@@ -27,19 +28,20 @@ float x() {
   }
 }
 
-float ^y::z() {}
+float ^a::z() {}
 
-float ^aa::bb(bool cc) {
-  float b;
+float ^a::bb(bool cc) {
+  float b, dd, zdd;
   dd = 1 + 5;
   zdd = new a;
 }
 
-char cc::dd() {
-  if(ee>3){
-    ff.gg();
-    hh.ii(2, 3 ,55);
+char a::dd() {
+  int a, ll, mm;
+  if(za>3){
+    zab();
+    zab(2, 3 ,55);
   } else {
-    ^jj.kk(-ll.mm[1]);
+    ^a.zab(-ll.mm[1]);
   }
 }

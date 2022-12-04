@@ -5,4 +5,10 @@
 */
 void validateDeclaration(Symbol sb);
 
+/**
+ * Atende a regra semantica 2.
+*/
+void validateReferenceInSymbolTable(char lexeme[]);
+void validateReferenceInTypeTable(char lexeme[]);
+
 void semanticError(char message[]);
