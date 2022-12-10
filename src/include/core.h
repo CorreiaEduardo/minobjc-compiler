@@ -128,5 +128,6 @@ Symbol symbolTable[1000];
 Symbol typeTable[1000];
 static const int GLOBAL_SCOPE = 0;
 static const int LOCAL_SCOPE = 1;
+int getSymbolTableTop();
 
 #endif /* CORE_H */

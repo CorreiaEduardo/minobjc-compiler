@@ -41,7 +41,7 @@ void prog() {
       objDef();
     } else if (isTypeOrVoid(token)) {
       Symbol sb = createSymbol();
-      sb.scope = 0;
+      sb.scope = GLOBAL_SCOPE;
       sb.type = token.tableIdx;
       process();
       declFuncAux(&sb);
@@ -63,7 +63,7 @@ void objDef() { // Class já foi processado
   processNextIf(matches(ID, -1));
 
   Symbol sb = createSymbol();
-  sb.scope = 0;
+  sb.scope = GLOBAL_SCOPE;
   sb.stereotype = STR_CLASS;
   sb.type = SB_CLASS;
   strcpy(sb.name, token.lexeme);
@@ -101,7 +101,7 @@ void methodSec() {
   while (isTypeOrVoid(token)) {
     Symbol sb = createSymbol();
     sb.type = token.tableIdx;
-    sb.scope = 0;
+    sb.scope = LOCAL_SCOPE;
     sb.stereotype = CFN;
     funcPrototype(&sb);
     getToken();
@@ -114,7 +114,7 @@ void methodSec() {
     while (isTypeOrVoid(token)) {
       Symbol sb = createSymbol();
       sb.type = token.tableIdx;
-      sb.scope = 0;
+      sb.scope = LOCAL_SCOPE;
       sb.stereotype = IFN;
 
       funcPrototype(&sb);
@@ -134,7 +134,7 @@ void varList(enum PUSH_BEHAVIOR pushBehavior) {
   }
 
   Symbol sb = createSymbol();
-  sb.scope = 1;
+  sb.scope = LOCAL_SCOPE;
   sb.stereotype = VAR;
   sb.type = token.tableIdx;
 
@@ -219,7 +219,7 @@ void paramType(enum PUSH_BEHAVIOR pushBehavior) {
     Symbol sb = createSymbol();
     sb.stereotype = ARG;
     sb.type = token.tableIdx;
-    sb.scope = 1;
+    sb.scope = LOCAL_SCOPE;
 
     process();
     getToken();
@@ -409,6 +409,7 @@ void funcPostOpBraces(char funcName[]) {
   if (funcName != NULL) {
     Symbol *sb = findInSymbolTable(funcName);
     sb->stereotype = FIMP;
+    validateDeclaration(*sb);
   }
 
   getToken();

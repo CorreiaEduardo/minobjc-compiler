@@ -73,7 +73,7 @@ void printTypeTable() {
 int existInTypeTable(char lexeme[], int scope) {
   int i, count = 0;
 
-  for (i = typeTableTop - 1; i >= 0; i--) {
+  for (i = typeTableTop - 1; i >= 0; i--) {    
     if (scope == LOCAL_SCOPE && isLocalScopeDelimiter(typeTable[i])) break;
     if ((stricmp(typeTable[i].name, lexeme) == 0) && typeTable[i].scope == scope) count++;
   }
@@ -87,6 +87,10 @@ int isLocalScopeDelimiter(Symbol sb) {
 
 int isFunction(Symbol sb) {
   return sb.stereotype == FIMP || sb.stereotype == GFN || sb.stereotype == CFN || sb.stereotype == IFN || sb.stereotype == SFN;
+}
+
+int getSymbolTableTop() {
+  return symbolTableTop;
 }
 
 void error(char msg[]) { 

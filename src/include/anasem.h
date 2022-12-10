@@ -1,7 +1,7 @@
 #include "../include/core.h"
 
 /**
- * Atende a regra semantica 1.
+ * Atende as regras semanticas 1, 4 e 5.
 */
 void validateDeclaration(Symbol sb);
 
@@ -10,5 +10,3 @@ void validateDeclaration(Symbol sb);
 */
 void validateReferenceInSymbolTable(char lexeme[]);
 void validateReferenceInTypeTable(char lexeme[]);
-
-void semanticError(char message[]);

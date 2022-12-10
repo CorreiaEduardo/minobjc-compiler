@@ -11,12 +11,21 @@ class a {
     bool lmn();
 }
 
+class aa {
+  data:
+    int aaaaazzzz;
+  code:
+    void ^g();
+  intern:
+    char k();
+}
+
 int o, pq;
 float rs(bool zzzz);
 float t(), u();
 char v[2];
 
-float x() {
+float a::g() {
   int as, a, i;
   float b;
   if(as!=b) {
@@ -26,6 +35,26 @@ float x() {
     delete a;
     for(;;){return a;}
   }
+}
+
+float aa::g() {
+  int as, a, i;
+  float b;
+  if(as!=b) {
+  ;
+  }
+  while(a>i) {
+    delete a;
+    for(;;){return a;}
+  }
+}
+
+float aa::fnaz() {
+
+}
+
+float a::fnaz() {
+
 }
 
 float ^a::z() {}
