@@ -32,9 +32,9 @@ float a::g() {
   if(as!=b) {
   ;
   }
-  while(a>i) {
+  while(^a>i) {
     delete a;
-    for(;;){return a;}
+    for(;;){return ^a;}
   }
 }
 
@@ -44,9 +44,9 @@ float aa::g() {
   if(as!=b) {
   ;
   }
-  while(a>i) {
+  while(^a>i) {
     delete a;
-    for(;;){return a;}
+    for(;;){return ^a;}
   }
 }
 
@@ -63,7 +63,7 @@ float ^a::z() {}
 float ^a::bb(bool cc) {
   float b, dd;
   void ^zdd;
-  dd = 1 + 5;
+  dd = 1 + ^zdd;
   zdd = new a;
 }
 

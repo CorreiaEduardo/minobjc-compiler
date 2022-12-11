@@ -25,3 +25,8 @@ void validateDeleteCommand(char lexeme[]);
  * Atende a regra semantica 17
 */
 void validateNewCommand(char lexeme[], Token tk);
+
+/**
+ * Atende a regra semantica 18
+*/
+void validateArithmeticFactor(char lexeme[], int circumflexFound);

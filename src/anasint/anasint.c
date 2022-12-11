@@ -11,7 +11,7 @@ void funcPostDoubleColon(Symbol *sb);
 void funcPostOpBraces(char funcName[]);
 void varDeclAux(Symbol *sb);
 void atribAux(char target[]);
-void factorPostCircumflex();
+void factorPostCircumflex(int circumflexFound);
 void atribPostOpBraces(char target[]);
 
 int isCmdStart(Token tk);
@@ -711,25 +711,29 @@ void factor() {
       factor();
     } else if (token.tableIdx == CIRCUMFLEX) {
       process();
-      factorPostCircumflex();
+      factorPostCircumflex(1);
     }
   } else if (token.type == ID) {
-    factorPostCircumflex();
+    factorPostCircumflex(0);
   } else if (token.type == ICT || token.type == FCT || token.type == CCT) {
     process();
   }
   printf("\n--- DEBUG: FINISHED FACTOR ROUTINE...");
 }
 
-void factorPostCircumflex() {
+void factorPostCircumflex(int circumflexFound) {
+  char aux[LEXEME_MAX_LENGTH];
+
   processNextIf(matches(ID, -1));
   validateReferenceInSymbolTable(token.lexeme);
+  strcpy(aux, token.lexeme);
   getToken();
   if (token.type == SN) {
     if (token.tableIdx == DOT) {
       process();
       processNextIf(matches(ID, -1));
       validateReferenceInSymbolTable(token.lexeme);
+      validateArithmeticFactor(aux, circumflexFound);
       getToken();
       if (token.type == SN) {
         if (token.tableIdx == OP_BRACKETS) {
@@ -754,10 +758,15 @@ void factorPostCircumflex() {
       }
     }
     else if (token.tableIdx == OP_BRACKETS) {
+      validateArithmeticFactor(aux, circumflexFound);
       process();
       expr();
       processNextIf(matches(SN, CL_BRACKETS));
+    } else {
+      validateArithmeticFactor(aux, circumflexFound);
     }
+  } else {
+    validateArithmeticFactor(aux, circumflexFound);
   }
 }
 

@@ -66,3 +66,12 @@ void validateNewCommand(char target[], Token tk) {
     error(errorMessage);
   }
 }
+
+void validateArithmeticFactor(char lexeme[], int circumflexFound) {
+  Symbol *sb = findInSymbolTable(lexeme);
+  if (sb->isPointer == 1 && circumflexFound == 0) {
+    char errorMessage[24];
+    snprintf(errorMessage, 24, "\nUtilização inválida de fator aritmético para %s", lexeme);
+    error(errorMessage);
+  }
+}
