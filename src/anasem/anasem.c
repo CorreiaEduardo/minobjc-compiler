@@ -5,7 +5,7 @@ void validateDeclaration(Symbol sb) {
   if (sb.stereotype == SFN) {
     int i;
     for (i = getSymbolTableTop() - 1; i >= 0; i--) {      
-      if (stricmp(symbolTable[i].name, sb.name) == 0 && stricmp(symbolTable[i].fnScope, sb.fnScope) == 0) {
+      if (stricmp(symbolTable[i].name, sb.name) == 0 && stricmp(symbolTable[i].class, sb.class) == 0) {
         snprintf(errorMessage, 24, "\nRedeclaração de %s não permitida", sb.name);
         error(errorMessage);
       }
@@ -60,7 +60,9 @@ void validateDeleteCommand(char lexeme[]) {
 
 void validateNewCommand(char target[], Token tk) {
   Symbol *sb = findInSymbolTable(target);
-  if (sb->type != SB_VOID) {
-    //TODO
+  if (sb->isPointer == 0 || sb->type != SB_VOID && stricmp(sb->class, tk.lexeme) != 0) {
+    char errorMessage[24];
+    snprintf(errorMessage, 24, "\nUtilização inválida do comando new para %s", tk.lexeme);
+    error(errorMessage);
   }
 }

@@ -61,7 +61,8 @@ float a::fnaz() {
 float ^a::z() {}
 
 float ^a::bb(bool cc) {
-  float b, dd, zdd;
+  float b, dd;
+  void ^zdd;
   dd = 1 + 5;
   zdd = new a;
 }

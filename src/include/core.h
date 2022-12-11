@@ -62,7 +62,8 @@ enum SYMBOL_TYPE {
   SB_CHAR = KW_CHAR,
   SB_FLOAT = KW_FLOAT,
   SB_BOOL = KW_BOOL,
-  SB_CLASS = KW_CLASS
+  SB_CLASS = KW_CLASS,
+  SB_OBJ = SB_CLASS + 100,
 };
 
 static const char * const symbolTypeNames[] = {
@@ -94,10 +95,8 @@ typedef struct {
   int isArray;
   int isPointer;
   int forceReference;
-  union {
-    int scope; // 0 = global
-    char fnScope[LEXEME_MAX_LENGTH];
-  };
+  int scope; // 0 = global
+  char class[LEXEME_MAX_LENGTH];
 } Symbol;
 
 enum PUSH_BEHAVIOR {

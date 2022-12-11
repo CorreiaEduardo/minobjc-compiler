@@ -44,7 +44,12 @@ void prog() {
     } else if (isTypeOrVoid(token)) {
       Symbol sb = createSymbol();
       sb.scope = GLOBAL_SCOPE;
-      sb.type = isPrimitiveType(token) ? token.tableIdx : SB_CLASS;
+      if (isPrimitiveType(token)) {
+        sb.type = token.tableIdx;
+      } else {
+        sb.type = SB_OBJ;
+        strcpy(sb.class, token.lexeme);
+      }
       process();
       declFuncAux(&sb);
     } else {
@@ -102,7 +107,12 @@ void methodSec() {
   getToken();
   while (isTypeOrVoid(token)) {
     Symbol sb = createSymbol();
-    sb.type = token.tableIdx;
+    if (isPrimitiveType(token)) {
+      sb.type = token.tableIdx;
+    } else {
+      sb.type = SB_OBJ;
+      strcpy(sb.class, token.lexeme);
+    }
     sb.scope = LOCAL_SCOPE;
     sb.stereotype = CFN;
     funcPrototype(&sb);
@@ -115,7 +125,12 @@ void methodSec() {
     getToken();
     while (isTypeOrVoid(token)) {
       Symbol sb = createSymbol();
-      sb.type = token.tableIdx;
+      if (isPrimitiveType(token)) {
+        sb.type = token.tableIdx;
+      } else {
+        sb.type = SB_OBJ;
+        strcpy(sb.class, token.lexeme);
+      }
       sb.scope = LOCAL_SCOPE;
       sb.stereotype = IFN;
 
@@ -138,7 +153,12 @@ void varList(enum PUSH_BEHAVIOR pushBehavior) {
   Symbol sb = createSymbol();
   sb.scope = LOCAL_SCOPE;
   sb.stereotype = VAR;
-  sb.type = token.tableIdx;
+  if (isPrimitiveType(token)) {
+    sb.type = token.tableIdx;
+  } else {
+    sb.type = SB_OBJ;
+    strcpy(sb.class, token.lexeme);
+  }
 
   process();
   getToken();
@@ -217,7 +237,12 @@ void paramType(enum PUSH_BEHAVIOR pushBehavior) {
   while (isTypeOrVoid(token)) {
     Symbol sb = createSymbol();
     sb.stereotype = ARG;
-    sb.type = token.tableIdx;
+    if (isPrimitiveType(token)) {
+      sb.type = token.tableIdx;
+    } else {
+      sb.type = SB_OBJ;
+      strcpy(sb.class, token.lexeme);
+    }
     sb.scope = LOCAL_SCOPE;
 
     process();
@@ -384,7 +409,7 @@ void funcPostDoubleColon(Symbol *sb) {
   processNextIf(matches(ID, -1));
 
   sb->stereotype = SFN;
-  strcpy(sb->fnScope, sb->name);
+  strcpy(sb->class, sb->name);
   strcpy(sb->name, token.lexeme);
   validateDeclaration(*sb);
   pushToSymbolTable(*sb);
@@ -429,7 +454,12 @@ void funcPrototype(Symbol *sb) {
     error("Syntax error");
   }
 
-  sb->type = token.tableIdx;
+  if (isPrimitiveType(token)) {
+    sb->type = token.tableIdx;
+  } else {
+    sb->type = SB_OBJ;
+    strcpy(sb->class, token.lexeme);
+  }
 
   process();
   getToken();
