@@ -4,7 +4,7 @@ class a {
   data:
     int ^a, ^b[10];
   code:
-    void ^g(int ^h,char i[]);
+    void ^g(int ^h,int i[]);
     int j();
   intern:
     char k();
@@ -20,13 +20,14 @@ class aa {
     char k();
 }
 
+a obj[1];
 int o, pq;
 float rs(bool zzzz);
 float t(), u();
 char v[2];
 
 float a::g() {
-  int as, a, i;
+  int as, ^a, i;
   float b;
   if(as!=b) {
   ;
@@ -38,7 +39,7 @@ float a::g() {
 }
 
 float aa::g() {
-  int as, a, i;
+  int as, ^a, i;
   float b;
   if(as!=b) {
   ;
@@ -65,7 +66,7 @@ float ^a::bb(bool cc) {
   zdd = new a;
 }
 
-char a::dd() {
+char aa::dd() {
   int a, ll, mm;
   if(za>3){
     zab();

@@ -20,6 +20,16 @@ void validateDeclaration(Symbol sb) {
     error(errorMessage);
   }
 
+  if (((sb.stereotype == VAR || sb.stereotype == ARG) && sb.type == SB_VOID) && sb.isPointer == 0) {
+    snprintf(errorMessage, 24, "\nUso do tipo void em variáveis e argumentos não é permitido", sb.name);
+    error(errorMessage);
+  }
+
+  if ((sb.isArray == 1 && sb.isPointer == 1) && sb.type == SB_CLASS) {
+    snprintf(errorMessage, 24, "\nVetor de apontador não permitido para %s", sb.name);
+    error(errorMessage);
+  }
+
 }
 
 void validateReferenceInSymbolTable(char lexeme[]) {
@@ -35,5 +45,22 @@ void validateReferenceInTypeTable(char lexeme[]) {
     char errorMessage[24];
     snprintf(errorMessage, 24, "\nReferencia inválida para %s", lexeme);
     error(errorMessage);
+  }
+}
+
+void validateDeleteCommand(char lexeme[]) {
+  Symbol *sb = findInSymbolTable(lexeme);
+  if (sb->isPointer == 0) {
+    char errorMessage[24];
+    snprintf(errorMessage, 24, "\nO comando delete só pode ser utilizado com apontadores %s", lexeme);
+    error(errorMessage);
+  }
+  
+}
+
+void validateNewCommand(char target[], Token tk) {
+  Symbol *sb = findInSymbolTable(target);
+  if (sb->type != SB_VOID) {
+    //TODO
   }
 }

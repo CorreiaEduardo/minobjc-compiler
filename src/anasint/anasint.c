@@ -10,15 +10,17 @@ void declFuncAux(Symbol *sb);
 void funcPostDoubleColon(Symbol *sb);
 void funcPostOpBraces(char funcName[]);
 void varDeclAux(Symbol *sb);
-void atribAux();
+void atribAux(char target[]);
 void factorPostCircumflex();
-void atribPostOpBraces();
+void atribPostOpBraces(char target[]);
 
 int isCmdStart(Token tk);
 int isRelationalOperator(Token tk);
 int isExprStart(Token tk);
+int isPrimitiveType(Token tk);
 
 Symbol createSymbol();
+Symbol createCopy(Symbol sb);
 
 void executeSyntaxAnalysis(FILE *file) {
   fd = file;
@@ -42,7 +44,7 @@ void prog() {
     } else if (isTypeOrVoid(token)) {
       Symbol sb = createSymbol();
       sb.scope = GLOBAL_SCOPE;
-      sb.type = token.tableIdx;
+      sb.type = isPrimitiveType(token) ? token.tableIdx : SB_CLASS;
       process();
       declFuncAux(&sb);
     } else {
@@ -162,10 +164,7 @@ void varList(enum PUSH_BEHAVIOR pushBehavior) {
 
   getToken();
   while (token.type == SN && token.tableIdx == COMMA) {
-    Symbol sb2;
-    sb2.scope = sb.scope;
-    sb2.stereotype = sb.stereotype;
-    sb2.type = sb.type;
+    Symbol sb2 = createCopy(sb);
 
     process();
     getToken();
@@ -322,10 +321,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
       do {
         processNextIf(matches(ID, -1));
 
-        Symbol sb2;
-        sb2.scope = sb->scope;
-        sb2.type = sb->type;
-        sb2.stereotype = sb->stereotype;
+        Symbol sb2 = createCopy(*sb);
         strcpy(sb2.name, token.lexeme);
         validateDeclaration(sb2);
         pushToSymbolTable(sb2);
@@ -347,9 +343,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
     }
 
     do {
-      Symbol sb2;
-      sb2.scope = sb->scope;
-      sb2.type = sb->type;
+      Symbol sb2 = createCopy(*sb);
       sb2.stereotype = VAR;
       process();
       getToken();
@@ -509,6 +503,7 @@ void cmd() {
       process();
       processNextIf(matches(ID, -1));
       validateReferenceInSymbolTable(token.lexeme);
+      validateDeleteCommand(token.lexeme);
       processNextIf(matches(SN, SEMI_COLON));
     }
   } else if (token.type == SN) {
@@ -548,6 +543,8 @@ void cmd() {
   } else if (token.type == ID) {
     process();
     validateReferenceInSymbolTable(token.lexeme);
+    char target[LEXEME_MAX_LENGTH];
+    strcpy(target, token.lexeme);
     getToken();
     if (token.type == SN) {
       if (token.tableIdx == DOT){
@@ -582,11 +579,11 @@ void cmd() {
         processNextIf(matches(SN, SEMI_COLON));
       } else if (token.tableIdx == OP_BRACES) {
         process();
-        atribPostOpBraces();
+        atribPostOpBraces(target);
         processNextIf(matches(SN, SEMI_COLON));
       } else if (token.tableIdx == EQ) {
         process();
-        atribAux();
+        atribAux(target);
         processNextIf(matches(SN, SEMI_COLON));
       } else syntaxError("Syntax error: sign expected");
     } else syntaxError("Syntax error: sign expected");
@@ -597,29 +594,32 @@ void cmd() {
 void atrib() {
   processNextIf(matches(ID, -1));
   validateReferenceInSymbolTable(token.lexeme);
+  char target[LEXEME_MAX_LENGTH];
+  strcpy(target, token.lexeme);
   getToken();
   if (token.type == SN && token.tableIdx == OP_BRACES) {
     process();
-    atribPostOpBraces();
+    atribPostOpBraces(target);
   }
 }
 
-void atribPostOpBraces() {//primeiro '[' já processado
+void atribPostOpBraces(char target[]) {//primeiro '[' já processado
   printf("\n--- DEBUG: EXECUTING ATRIB ROUTINE...");
   expr();
   processNextIf(matches(SN, CL_BRACES));
   processNextIf(matches(SN, EQ));
-  atribAux();
+  atribAux(target);
   printf("\n--- DEBUG: FINISHED ATRIB ROUTINE...");
 }
 
-void atribAux() {//até '=' já foi processado
+void atribAux(char target[]) {//até '=' já foi processado
   printf("\n--- DEBUG: EXECUTING ATRIBAUX ROUTINE...");
   getToken();
   if (token.type == KW && token.tableIdx == NEW) {
     process();
     getToken();
     if (isTypeOrVoid(token)) {
+      validateNewCommand(target, token);
       process();
     } else syntaxError("Type expected");
   } else if (isExprStart(token)) {
@@ -797,16 +797,16 @@ void syntaxError(char message[]) {
   error(errorMessage);
 }
 
-int isTypeOrVoid(Token tk) {
-  int isPrimitiveType = tk.type == KW && (
+int isPrimitiveType(Token tk) {
+  return tk.type == KW && (
     tk.tableIdx == CHAR_TYPE || tk.tableIdx == INT_TYPE || 
     tk.tableIdx == FLOAT_TYPE || tk.tableIdx == BOOL_TYPE || 
     tk.tableIdx == VOID_TYPE
   );
+}
 
-  int isUserDefinedType = isIdDefined(tk);
-
-  return isPrimitiveType || isUserDefinedType;
+int isTypeOrVoid(Token tk) {
+  return isPrimitiveType(tk) || isIdDefined(tk);
 }
 
 int isCmdStart(Token tk) {
@@ -850,4 +850,14 @@ Symbol createSymbol() {
   sb.isPointer = 0;
 
   return sb;
+}
+
+Symbol createCopy(Symbol sb) {
+  Symbol sb2 = createSymbol();
+
+  sb2.scope = sb.scope;
+  sb2.stereotype = sb.stereotype;
+  sb2.type = sb.type;
+
+  return sb2;
 }
