@@ -834,8 +834,8 @@ void process() {
 }
 
 void syntaxError(char message[]) {
-  char errorMessage[24];
-  snprintf(errorMessage, 24, "\n%s", message);
+  char errorMessage[100];
+  snprintf(errorMessage, 100, "\n%s", message);
   error(errorMessage);
 }
 

@@ -1,10 +1,10 @@
 #include "../include/anasem.h"
 
 void validateDeclaration(Symbol sb) {
-  char errorMessage[24];
+  char errorMessage[100];
 
   if (sb.stereotype == FIMP && sb.scope == GLOBAL_SCOPE) {
-    snprintf(errorMessage, 24, "\nImplementação de função global %s não permitida", sb.name);
+    snprintf(errorMessage, 100, "\nGlobal function implementation not allowed for %s", sb.name);
     error(errorMessage);
   }
 
@@ -17,21 +17,21 @@ void validateDeclaration(Symbol sb) {
     }
 
     if (count > 1) {
-      snprintf(errorMessage, 24, "\nRedeclaração de %s não permitida", sb.name);
+      snprintf(errorMessage, 100, "\nRedeclaration not allowed for %s", sb.name);
       error(errorMessage);
     }
   } else if (existInSymbolTable(sb.name, sb.scope) || existInTypeTable(sb.name, sb.scope)) {
-    snprintf(errorMessage, 24, "\nRedeclaração de %s não permitida", sb.name);
+    snprintf(errorMessage, 100, "\nRedeclaration not allowed for %s", sb.name);
     error(errorMessage);
   }
 
   if (((sb.stereotype == VAR || sb.stereotype == ARG) && sb.type == SB_VOID) && sb.isPointer == 0) {
-    snprintf(errorMessage, 24, "\nUso do tipo void em variáveis e argumentos não é permitido", sb.name);
+    snprintf(errorMessage, 100, "\nVoid type not allowed for variables (%s)", sb.name);
     error(errorMessage);
   }
 
   if ((sb.isArray == 1 && sb.isPointer == 1) && sb.type == SB_CLASS) {
-    snprintf(errorMessage, 24, "\nVetor de apontador não permitido para %s", sb.name);
+    snprintf(errorMessage, 100, "\nPointer vector not allowed (%s)", sb.name);
     error(errorMessage);
   }
 
@@ -47,7 +47,7 @@ void validateDeclaration(Symbol sb) {
     }
 
     if (found == 0) {
-      snprintf(errorMessage, 24, "\nAssinatura não encontrada para a declaração: %s", sb.name);
+      snprintf(errorMessage, 100, "\nFuntion signature not found for %s", sb.name);
       error(errorMessage);
     }
 
@@ -76,7 +76,7 @@ void validateDeclaration(Symbol sb) {
     }
 
     if (original.isPointer != sb.isPointer || original.type != sb.type || stricmp(original.cType, sb.cType) != 0 || validArgs == 0) {
-      snprintf(errorMessage, 24, "\nDeclaração não compatível com assinatura: %s", sb.name);
+      snprintf(errorMessage, 100, "\nSignature mismatch for %s", sb.name);
       error(errorMessage);
     }
   }
@@ -84,16 +84,16 @@ void validateDeclaration(Symbol sb) {
 
 void validateReferenceInSymbolTable(char lexeme[]) {
   if (!existInSymbolTable(lexeme, LOCAL_SCOPE) && !existInSymbolTable(lexeme, GLOBAL_SCOPE)) {
-    char errorMessage[24];
-    snprintf(errorMessage, 24, "\nReferencia inválida para %s", lexeme);
+    char errorMessage[100];
+    snprintf(errorMessage, 100, "\nInvalid reference for %s", lexeme);
     error(errorMessage);
   }
 }
 
 void validateReferenceInTypeTable(char lexeme[]) {
   if (!existInTypeTable(lexeme, LOCAL_SCOPE) && !existInTypeTable(lexeme, GLOBAL_SCOPE)) {
-    char errorMessage[24];
-    snprintf(errorMessage, 24, "\nReferencia inválida para %s", lexeme);
+    char errorMessage[100];
+    snprintf(errorMessage, 100, "\nInvalid reference for %s", lexeme);
     error(errorMessage);
   }
 }
@@ -101,8 +101,8 @@ void validateReferenceInTypeTable(char lexeme[]) {
 void validateDeleteCommand(char lexeme[]) {
   Symbol *sb = findInSymbolTable(lexeme);
   if (sb->isPointer == 0) {
-    char errorMessage[24];
-    snprintf(errorMessage, 24, "\nO comando delete só pode ser utilizado com apontadores %s", lexeme);
+    char errorMessage[100];
+    snprintf(errorMessage, 100, "\nInvalid usage for DELETE command (%s)", lexeme);
     error(errorMessage);
   }
   
@@ -111,8 +111,8 @@ void validateDeleteCommand(char lexeme[]) {
 void validateNewCommand(char target[], Token tk) {
   Symbol *sb = findInSymbolTable(target);
   if (sb->isPointer == 0 || sb->type != SB_VOID && stricmp(sb->class, tk.lexeme) != 0) {
-    char errorMessage[24];
-    snprintf(errorMessage, 24, "\nUtilização inválida do comando new para %s", tk.lexeme);
+    char errorMessage[100];
+    snprintf(errorMessage, 100, "\nInvalid usage for NEW command (%s)", tk.lexeme);
     error(errorMessage);
   }
 }
@@ -120,8 +120,8 @@ void validateNewCommand(char target[], Token tk) {
 void validateArithmeticFactor(char lexeme[], int circumflexFound) {
   Symbol *sb = findInSymbolTable(lexeme);
   if (sb->isPointer == 1 && circumflexFound == 0) {
-    char errorMessage[24];
-    snprintf(errorMessage, 24, "\nUtilização inválida de fator aritmético para %s", lexeme);
+    char errorMessage[100];
+    snprintf(errorMessage, 100, "\nInvalid arithmetic factor (%s)", lexeme);
     error(errorMessage);
   }
 }
