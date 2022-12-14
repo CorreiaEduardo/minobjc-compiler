@@ -169,6 +169,22 @@ void validateScopeAccess(char baseId[], char fieldId[], char classScope[]) {
   }
 }
 
+void validateInternSection(Symbol originalClass) {
+  Symbol *sb = findInTypeTable(originalClass.name, originalClass.name);
+  if (sb == NULL || sb->stereotype != IFN) {
+    char errorMessage[100];
+    snprintf(errorMessage, 100, "\nConstructor must be provided (%s)", originalClass.name);
+    error(errorMessage);
+  }
+
+  // sb = findInTypeTable(originalClass.name, strcat(originalClass.name, "~\0"));
+  // if (sb == NULL) {
+  //   char errorMessage[100];
+  //   snprintf(errorMessage, 100, "\nDestructor must be provided (%s)", originalClass.name);
+  //   error(errorMessage);
+  // }
+}
+
 int compareTypes(Symbol sb, Symbol sb2) {
   if (sb.type == SB_OBJ) {
     if (sb2.type != SB_OBJ) return 0;

@@ -139,6 +139,7 @@ void methodSec(Symbol originalClass) {
       funcPrototype(&sb);
       getToken();
     }
+    validateInternSection(originalClass);
   } else {
     syntaxError("'Intern' expected");
   }

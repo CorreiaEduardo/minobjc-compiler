@@ -8,6 +8,7 @@ class aa {
     void ^g();
     char dd();
   intern:
+    aa aa();
     char k();
 }
 
@@ -18,6 +19,7 @@ class a {
     void ^g(int ^h,int i[]);
     float ^bb(bool cc);
   intern:
+    a a();
     char k();
     bool lmn();
 }

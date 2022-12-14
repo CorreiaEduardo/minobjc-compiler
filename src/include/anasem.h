@@ -33,10 +33,14 @@ void validateNewCommand(char lexeme[], Token tk);
 void validateArithmeticFactor(char lexeme[], int circumflexFound);
 
 /**
- * Atende a regra semantica 10
+ * Atende as regras semanticas 10, 11 e 12
 */
 void validateScopeAccess(char baseId[], char fieldId[], char classScope[]);
 
+/**
+ * Atende a regra semantica 19
+*/
+void validateInternSection(Symbol originalClass);
 
 /**
  * Utility
