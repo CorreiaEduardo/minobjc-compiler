@@ -5,7 +5,7 @@ class a {
     int ^a, ^b[10];
   code:
     void ^g(int ^h,int i[]);
-    int j();
+    float ^bb(bool cc);
   intern:
     char k();
     bool lmn();
@@ -16,6 +16,7 @@ class aa {
     int aaaaazzzz;
   code:
     void ^g();
+    char dd();
   intern:
     char k();
 }
@@ -26,8 +27,8 @@ float rs(bool zzzz);
 float t(), u();
 char v[2];
 
-float a::g() {
-  int as, ^a, i;
+void ^a::g(int ^h,int i[]) {
+  int as, ^a;
   float b;
   if(as!=b) {
   ;
@@ -38,7 +39,7 @@ float a::g() {
   }
 }
 
-float aa::g() {
+void ^aa::g() {
   int as, ^a, i;
   float b;
   if(as!=b) {
@@ -49,16 +50,6 @@ float aa::g() {
     for(;;){return ^a;}
   }
 }
-
-float aa::fnaz() {
-
-}
-
-float a::fnaz() {
-
-}
-
-float ^a::z() {}
 
 float ^a::bb(bool cc) {
   float b, dd;

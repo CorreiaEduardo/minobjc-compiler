@@ -93,6 +93,10 @@ int getSymbolTableTop() {
   return symbolTableTop;
 }
 
+int getTypeTableTop() {
+  return typeTableTop;
+}
+
 void error(char msg[]) { 
   printf("%s\n", msg);
   system("pause");

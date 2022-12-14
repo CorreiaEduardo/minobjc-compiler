@@ -72,7 +72,8 @@ static const char * const symbolTypeNames[] = {
   [SB_CHAR] =  "SB_CHAR",
   [SB_FLOAT] =  "SB_FLOAT",
   [SB_BOOL] =  "SB_BOOL",
-  [SB_CLASS] = "SB_CLASS"
+  [SB_CLASS] = "SB_CLASS",
+  [SB_OBJ] = "SB_OBJ"
 };
 
 static const char * const symbolStereotypeNames[] = {
@@ -96,7 +97,8 @@ typedef struct {
   int isPointer;
   int forceReference;
   int scope; // 0 = global
-  char class[LEXEME_MAX_LENGTH];
+  char class[LEXEME_MAX_LENGTH]; // classe detendora de uma FN
+  char cType[LEXEME_MAX_LENGTH]; // tipo customizado (retorno ou instancia)
 } Symbol;
 
 enum PUSH_BEHAVIOR {
@@ -128,5 +130,6 @@ Symbol typeTable[1000];
 static const int GLOBAL_SCOPE = 0;
 static const int LOCAL_SCOPE = 1;
 int getSymbolTableTop();
+int getTypeTableTop();
 
 #endif /* CORE_H */

@@ -48,7 +48,7 @@ void prog() {
         sb.type = token.tableIdx;
       } else {
         sb.type = SB_OBJ;
-        strcpy(sb.class, token.lexeme);
+        strcpy(sb.cType, token.lexeme);
       }
       process();
       declFuncAux(&sb);
@@ -79,14 +79,14 @@ void objDef() { // Class já foi processado
 
   processNextIf(matches(SN, OP_BRACES));
 
-  dataSec();
-  methodSec();
+  dataSec(sb);
+  methodSec(sb);
 
   processNextIf(matches(SN, CL_BRACES));
   printf("\n--- DEBUG: FINISHED OBJDEF ROUTINE...");
 }
 
-void dataSec() {
+void dataSec(Symbol originalClass) {
   printf("\n--- DEBUG: EXECUTING DATASEC ROUTINE...");
   processNextIf(matches(KW, DATA));
   processNextIf(matches(SN, COLON));
@@ -99,7 +99,7 @@ void dataSec() {
   printf("\n--- DEBUG: FINISHED DATASEC ROUTINE...");
 }
 
-void methodSec() {
+void methodSec(Symbol originalClass) {
   printf("\n--- DEBUG: EXECUTING METHODSEC ROUTINE...");
   processNextIf(matches(KW, CODE));
   processNextIf(matches(SN, COLON));
@@ -111,8 +111,9 @@ void methodSec() {
       sb.type = token.tableIdx;
     } else {
       sb.type = SB_OBJ;
-      strcpy(sb.class, token.lexeme);
+      strcpy(sb.cType, token.lexeme);
     }
+    strcpy(sb.class, originalClass.name);
     sb.scope = LOCAL_SCOPE;
     sb.stereotype = CFN;
     funcPrototype(&sb);
@@ -131,6 +132,7 @@ void methodSec() {
         sb.type = SB_OBJ;
         strcpy(sb.class, token.lexeme);
       }
+      strcpy(sb.class, originalClass.name);
       sb.scope = LOCAL_SCOPE;
       sb.stereotype = IFN;
 
@@ -157,7 +159,7 @@ void varList(enum PUSH_BEHAVIOR pushBehavior) {
     sb.type = token.tableIdx;
   } else {
     sb.type = SB_OBJ;
-    strcpy(sb.class, token.lexeme);
+    strcpy(sb.cType, token.lexeme);
   }
 
   process();
@@ -241,7 +243,7 @@ void paramType(enum PUSH_BEHAVIOR pushBehavior) {
       sb.type = token.tableIdx;
     } else {
       sb.type = SB_OBJ;
-      strcpy(sb.class, token.lexeme);
+      strcpy(sb.cType, token.lexeme);
     }
     sb.scope = LOCAL_SCOPE;
 
@@ -411,12 +413,13 @@ void funcPostDoubleColon(Symbol *sb) {
   sb->stereotype = SFN;
   strcpy(sb->class, sb->name);
   strcpy(sb->name, token.lexeme);
-  validateDeclaration(*sb);
   pushToSymbolTable(*sb);
 
   processNextIf(matches(SN, OP_PARENTHESIS));
   paramType(SBT_PUSH);
   processNextIf(matches(SN, CL_PARENTHESIS));
+  validateDeclaration(*sb);
+
   processNextIf(matches(SN, OP_BRACES));
   funcPostOpBraces(NULL);
   printf("\n--- DEBUG: FINISHED FUNCPOSTDOUBLECOLON ROUTINE...");

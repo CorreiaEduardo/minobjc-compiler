@@ -1,12 +1,12 @@
 #include "../include/core.h"
 
 /**
- * As regras semanticas 13 e 14 são atendidas pela natureza do funcionamento
+ * As regras semanticas 3, 13 e 14 são atendidas pela natureza do funcionamento
  * do motor de analise sintatica.
 */
 
 /**
- * Atende as regras semanticas 1, 4, 5, 7, 8 e 16.
+ * Atende as regras semanticas 1, 4, 5, 6, 7, 8 e 16.
 */
 void validateDeclaration(Symbol sb);
 
@@ -30,3 +30,10 @@ void validateNewCommand(char lexeme[], Token tk);
  * Atende a regra semantica 18
 */
 void validateArithmeticFactor(char lexeme[], int circumflexFound);
+
+
+/**
+ * Utility
+*/
+
+int compareTypes(Symbol sb, Symbol sb2);
