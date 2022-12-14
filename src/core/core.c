@@ -10,9 +10,10 @@ int isIdDefined(Token tk) {
   if (tk.type != ID) return 0;
   
   int i;
-  for (i = 1; i < (sizeof(typeTable)) / (sizeof(typeTable[0])) - 1; i++)
-  {
-    if (stricmp(tk.lexeme, typeTable[i].name) == 0) return 1;
+  for (i = 0; i < getTypeTableTop(); i++) {
+    if (stricmp(tk.lexeme, typeTable[i].name) == 0 && typeTable[i].stereotype == STR_CLASS) {
+      return 1;
+    }
   }
 
   return 0;

@@ -1,5 +1,16 @@
 int za;
 int zab();
+
+class aa {
+  data:
+    int a;
+  code:
+    void ^g();
+    char dd();
+  intern:
+    char k();
+}
+
 class a {
   data:
     int ^a, ^b[10];
@@ -9,16 +20,6 @@ class a {
   intern:
     char k();
     bool lmn();
-}
-
-class aa {
-  data:
-    int aaaaazzzz;
-  code:
-    void ^g();
-    char dd();
-  intern:
-    char k();
 }
 
 a obj[1];
