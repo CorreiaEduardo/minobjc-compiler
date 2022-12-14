@@ -13,6 +13,7 @@ void validateDeclaration(Symbol sb);
 /**
  * Atende as regras semanticas 2 e 9.
 */
+void validateReference(char lexeme[]);
 void validateReferenceInSymbolTable(char lexeme[]);
 void validateReferenceInTypeTable(char lexeme[]);
 
@@ -30,6 +31,11 @@ void validateNewCommand(char lexeme[], Token tk);
  * Atende a regra semantica 18
 */
 void validateArithmeticFactor(char lexeme[], int circumflexFound);
+
+/**
+ * Atende a regra semantica 10
+*/
+void validateScopeAccess(char baseId[], char fieldId[], char classScope[]);
 
 
 /**

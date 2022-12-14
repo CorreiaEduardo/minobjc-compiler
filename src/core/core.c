@@ -45,6 +45,8 @@ Symbol *findInSymbolTable(char lexeme[]) {
   for (i = symbolTableTop - 1; i >= 0; i--) {
     if (stricmp(symbolTable[i].name, lexeme) == 0) return &symbolTable[i];
   }
+
+  return NULL;
 }
 
 int existInSymbolTable(char lexeme[], int scope) {
@@ -71,7 +73,7 @@ void printTypeTable() {
   }
 }
 
-int existInTypeTable(char lexeme[], int scope) {
+int existInTypeTableByScope(char lexeme[], int scope) {
   int i, count = 0;
 
   for (i = typeTableTop - 1; i >= 0; i--) {    
@@ -80,6 +82,25 @@ int existInTypeTable(char lexeme[], int scope) {
   }
 
   return count > 0;
+}
+
+int existInTypeTable(char lexeme[]) {
+  int i, count = 0;
+
+  for (i = typeTableTop - 1; i >= 0; i--) {    
+    if (stricmp(typeTable[i].name, lexeme) == 0) count++;
+  }
+
+  return count > 0;
+}
+
+Symbol *findInTypeTable(char class[], char lexeme[]) {
+  int i;
+  for (i = typeTableTop - 1; i >= 0; i--) {
+    if (stricmp(typeTable[i].name, lexeme) == 0 && stricmp(typeTable[i].class, class) == 0) return &typeTable[i];
+  }
+
+  return NULL;
 }
 
 int isLocalScopeDelimiter(Symbol sb) {

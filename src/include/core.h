@@ -120,7 +120,9 @@ int existInSymbolTable(char lexeme[], int scope);
 
 void pushToTypeTable(Symbol sb);
 void printTypeTable();
-int existInTypeTable(char lexeme[], int scope);
+Symbol *findInTypeTable(char class[], char lexeme[]);
+int existInTypeTableByScope(char lexeme[], int scope);
+int existInTypeTable(char lexeme[]);
 
 int isIdDefined(Token tk);
 

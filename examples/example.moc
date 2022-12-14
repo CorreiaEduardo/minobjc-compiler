@@ -65,6 +65,6 @@ char aa::dd() {
     zab();
     zab(2, 3 ,55);
   } else {
-    ^a.zab(-ll.mm[1]);
+    ^a.zab(a);
   }
 }

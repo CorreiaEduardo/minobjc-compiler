@@ -20,7 +20,7 @@ void validateDeclaration(Symbol sb) {
       snprintf(errorMessage, 100, "\nRedeclaration not allowed for %s", sb.name);
       error(errorMessage);
     }
-  } else if (existInSymbolTable(sb.name, sb.scope) || existInTypeTable(sb.name, sb.scope)) {
+  } else if (existInSymbolTable(sb.name, sb.scope) || existInTypeTableByScope(sb.name, sb.scope)) {
     snprintf(errorMessage, 100, "\nRedeclaration not allowed for %s", sb.name);
     error(errorMessage);
   }
@@ -75,8 +75,22 @@ void validateDeclaration(Symbol sb) {
       k++;
     }
 
+    if (typeTable[j].stereotype == ARG || symbolTable[k].stereotype == ARG) {
+      validArgs = 0;
+    }
+
     if (original.isPointer != sb.isPointer || original.type != sb.type || stricmp(original.cType, sb.cType) != 0 || validArgs == 0) {
       snprintf(errorMessage, 100, "\nSignature mismatch for %s", sb.name);
+      error(errorMessage);
+    }
+  }
+}
+
+void validateReference(char lexeme[]) {
+  if (!existInSymbolTable(lexeme, LOCAL_SCOPE) && !existInSymbolTable(lexeme, GLOBAL_SCOPE)) {
+    if (!existInTypeTableByScope(lexeme, LOCAL_SCOPE) && !existInTypeTableByScope(lexeme, GLOBAL_SCOPE)) {
+      char errorMessage[100];
+      snprintf(errorMessage, 100, "\nInvalid reference for %s", lexeme);
       error(errorMessage);
     }
   }
@@ -91,7 +105,7 @@ void validateReferenceInSymbolTable(char lexeme[]) {
 }
 
 void validateReferenceInTypeTable(char lexeme[]) {
-  if (!existInTypeTable(lexeme, LOCAL_SCOPE) && !existInTypeTable(lexeme, GLOBAL_SCOPE)) {
+  if (!existInTypeTableByScope(lexeme, LOCAL_SCOPE) && !existInTypeTableByScope(lexeme, GLOBAL_SCOPE)) {
     char errorMessage[100];
     snprintf(errorMessage, 100, "\nInvalid reference for %s", lexeme);
     error(errorMessage);
@@ -126,12 +140,41 @@ void validateArithmeticFactor(char lexeme[], int circumflexFound) {
   }
 }
 
+void validateScopeAccess(char baseId[], char fieldId[], char classScope[]) {
+  char forbiddenAccessMessage[100];
+  snprintf(forbiddenAccessMessage, 100, "\nCan't access field %s", fieldId);
+
+  Symbol *sb = findInSymbolTable(fieldId);
+
+  if (classScope == NULL) { // função global
+    if (sb == NULL || (sb->stereotype != GFN || sb->stereotype != FIMP)) {
+      error(forbiddenAccessMessage);
+    }
+  } else { //função de escopo
+    sb = sb == NULL ? findInTypeTable(classScope, fieldId) : sb;
+
+    if (sb == NULL) {
+      Symbol *sb2 = findInSymbolTable(baseId);
+      if (sb2 != NULL) {
+        Symbol *sb3 = findInTypeTable(sb2->cType, fieldId);
+        if (sb3 != NULL) {
+          sb = sb3->stereotype == CFN ? sb3 : sb;
+        }
+      }
+    }
+
+    if (sb == NULL) {
+      error(forbiddenAccessMessage);
+    }
+  }
+}
+
 int compareTypes(Symbol sb, Symbol sb2) {
   if (sb.type == SB_OBJ) {
     if (sb2.type != SB_OBJ) return 0;
-    return stricmp(sb.cType, sb2.cType) == 0;
+    return (stricmp(sb.cType, sb2.cType) == 0) && (sb.isPointer == sb2.isPointer) && (sb.isArray == sb2.isArray);
   } else {
     if (sb2.type == SB_OBJ) return 0;
-    return sb.type == sb2.type;
+    return (sb.type == sb2.type) && (sb.isPointer == sb2.isPointer) && (sb.isArray == sb2.isArray);
   }
 }

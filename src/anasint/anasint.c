@@ -8,11 +8,11 @@ void process();
 
 void declFuncAux(Symbol *sb);
 void funcPostDoubleColon(Symbol *sb);
-void funcPostOpBraces(char funcName[]);
+void funcPostOpBraces(char funcName[], char classScope[]);
 void varDeclAux(Symbol *sb);
-void atribAux(char target[]);
-void factorPostCircumflex(int circumflexFound);
-void atribPostOpBraces(char target[]);
+void atribAux(char target[], char classScope[]);
+void factorPostCircumflex(int circumflexFound, char classScope[]);
+void atribPostOpBraces(char target[], char classScope[]);
 
 int isCmdStart(Token tk);
 int isRelationalOperator(Token tk);
@@ -92,7 +92,7 @@ void dataSec(Symbol originalClass) {
   processNextIf(matches(SN, COLON));
 
   do {
-    varList(TPT_PUSH);
+    varList(&originalClass, TPT_PUSH);
     processNextIf(matches(SN, SEMI_COLON));
     getToken();
   } while (isTypeOrVoid(token));
@@ -145,7 +145,7 @@ void methodSec(Symbol originalClass) {
   printf("\n--- DEBUG: FINISHED METHODSEC ROUTINE...");
 }
 
-void varList(enum PUSH_BEHAVIOR pushBehavior) {
+void varList(Symbol *originalClass, enum PUSH_BEHAVIOR pushBehavior) {
   printf("\n--- DEBUG: EXECUTING VARLIST ROUTINE...");
   getToken();
   if (!isTypeOrVoid(token)) {
@@ -160,6 +160,9 @@ void varList(enum PUSH_BEHAVIOR pushBehavior) {
   } else {
     sb.type = SB_OBJ;
     strcpy(sb.cType, token.lexeme);
+  }
+  if (pushBehavior == TPT_PUSH) {
+    strcpy(sb.class, originalClass->name);
   }
 
   process();
@@ -342,7 +345,7 @@ void declFuncAux(Symbol *sb) { // Tipo já foi processado
     getToken();
     if (token.type == SN && token.tableIdx == OP_BRACES) {
       process();
-      funcPostOpBraces(sb->name);
+      funcPostOpBraces(sb->name, NULL);
     } else if (token.type == SN && token.tableIdx == COMMA) {
       process();
       do {
@@ -421,11 +424,11 @@ void funcPostDoubleColon(Symbol *sb) {
   validateDeclaration(*sb);
 
   processNextIf(matches(SN, OP_BRACES));
-  funcPostOpBraces(NULL);
+  funcPostOpBraces(NULL, sb->class);
   printf("\n--- DEBUG: FINISHED FUNCPOSTDOUBLECOLON ROUTINE...");
 }
 
-void funcPostOpBraces(char funcName[]) {
+void funcPostOpBraces(char funcName[], char classScope[]) {
   printf("\n--- DEBUG: EXECUTING FUNCPOSTOPBRACES ROUTINE...");
 
   if (funcName != NULL) {
@@ -436,13 +439,13 @@ void funcPostOpBraces(char funcName[]) {
 
   getToken();
   while (isTypeOrVoid(token)) {
-    varList(SBT_PUSH);
+    varList(NULL, SBT_PUSH);
     processNextIf(matches(SN, SEMI_COLON));
     getToken();
   }
 
   while (isCmdStart(token)) {
-    cmd();
+    cmd(classScope);
     getToken();
   }
 
@@ -485,51 +488,51 @@ void funcPrototype(Symbol *sb) {
   printf("\n--- DEBUG: FINISHED FUNCPROTOTYPE ROUTINE...");
 }
 
-void cmd() {
+void cmd(char classScope[]) {
   printf("\n--- DEBUG: EXECUTING CMD ROUTINE...");
   getToken();
   if (token.type == KW) {
     if (token.tableIdx == IF) {
       process();
       processNextIf(matches(SN, OP_PARENTHESIS));
-      expr();
+      expr(classScope);
       processNextIf(matches(SN, CL_PARENTHESIS));
-      cmd();
+      cmd(classScope);
       getToken();
       if (token.type == KW && token.tableIdx == ELSE) {
         process();
-        cmd();
+        cmd(classScope);
       }
     } else if (token.tableIdx == WHILE) {
       process();
       processNextIf(matches(SN, OP_PARENTHESIS));
-      expr();
+      expr(classScope);
       processNextIf(matches(SN, CL_PARENTHESIS));
-      cmd();
+      cmd(classScope);
     } else if (token.tableIdx == FOR) {
       process();
       processNextIf(matches(SN, OP_PARENTHESIS));
       getToken();
       if (token.type == ID) {
-        atrib();
+        atrib(classScope);
       }
       processNextIf(matches(SN, SEMI_COLON));
       getToken();
       if (isExprStart(token)) {
-        expr();
+        expr(classScope);
       }
       processNextIf(matches(SN, SEMI_COLON));
       getToken();
       if (token.type == ID) {
-        atrib();
+        atrib(classScope);
       }
       processNextIf(matches(SN, CL_PARENTHESIS));
-      cmd();
+      cmd(classScope);
     } else if (token.tableIdx == RETURN) {
       process();
       getToken();
       if (isExprStart(token)) {
-        expr();
+        expr(classScope);
       }
       processNextIf(matches(SN, SEMI_COLON));
     } else if (token.tableIdx == DELETE) {
@@ -550,11 +553,11 @@ void cmd() {
       processNextIf(matches(SN, OP_PARENTHESIS));
       getToken();
       if (isExprStart(token)) {
-        expr();
+        expr(classScope);
         getToken();
         while (token.type == SN && token.tableIdx == COMMA) {
           process();
-          expr();
+          expr(classScope);
           getToken();
         }
       }
@@ -564,7 +567,7 @@ void cmd() {
       process();
       getToken();
       while (isCmdStart(token)) {
-        cmd();
+        cmd(classScope);
         getToken();
       }
       processNextIf(matches(SN, CL_BRACES));
@@ -575,7 +578,8 @@ void cmd() {
     }
   } else if (token.type == ID) {
     process();
-    validateReferenceInSymbolTable(token.lexeme);
+    validateReference(token.lexeme);
+    validateScopeAccess(NULL, token.lexeme, classScope);
     char target[LEXEME_MAX_LENGTH];
     strcpy(target, token.lexeme);
     getToken();
@@ -583,14 +587,15 @@ void cmd() {
       if (token.tableIdx == DOT){
         process();
         processNextIf(matches(ID, -1));
+        validateScopeAccess(target, token.lexeme, classScope);
         processNextIf(matches(SN, OP_PARENTHESIS));
         getToken();
         if (isExprStart(token)) {
-          expr();
+          expr(classScope);
           getToken();
           while (token.type == SN && token.tableIdx == COMMA) {
             process();
-            expr();
+            expr(classScope);
             getToken();
           }
         }
@@ -600,11 +605,11 @@ void cmd() {
         process();
         getToken();
         if (isExprStart(token)) {
-          expr();
+          expr(classScope);
           getToken();
           while (token.type == SN && token.tableIdx == COMMA) {
             process();
-            expr();
+            expr(classScope);
             getToken();
           }
         }
@@ -612,11 +617,11 @@ void cmd() {
         processNextIf(matches(SN, SEMI_COLON));
       } else if (token.tableIdx == OP_BRACES) {
         process();
-        atribPostOpBraces(target);
+        atribPostOpBraces(target, classScope);
         processNextIf(matches(SN, SEMI_COLON));
       } else if (token.tableIdx == EQ) {
         process();
-        atribAux(target);
+        atribAux(target, classScope);
         processNextIf(matches(SN, SEMI_COLON));
       } else syntaxError("Syntax error: sign expected");
     } else syntaxError("Syntax error: sign expected");
@@ -624,7 +629,7 @@ void cmd() {
   printf("\n--- DEBUG: FINISHED CMD ROUTINE...");
 }
 
-void atrib() {
+void atrib(char classScope[]) {
   processNextIf(matches(ID, -1));
   validateReferenceInSymbolTable(token.lexeme);
   char target[LEXEME_MAX_LENGTH];
@@ -632,20 +637,20 @@ void atrib() {
   getToken();
   if (token.type == SN && token.tableIdx == OP_BRACES) {
     process();
-    atribPostOpBraces(target);
+    atribPostOpBraces(target, classScope);
   }
 }
 
-void atribPostOpBraces(char target[]) {//primeiro '[' já processado
+void atribPostOpBraces(char target[], char classScope[]) {//primeiro '[' já processado
   printf("\n--- DEBUG: EXECUTING ATRIB ROUTINE...");
-  expr();
+  expr(classScope);
   processNextIf(matches(SN, CL_BRACES));
   processNextIf(matches(SN, EQ));
-  atribAux(target);
+  atribAux(target, classScope);
   printf("\n--- DEBUG: FINISHED ATRIB ROUTINE...");
 }
 
-void atribAux(char target[]) {//até '=' já foi processado
+void atribAux(char target[], char classScope[]) {//até '=' já foi processado
   printf("\n--- DEBUG: EXECUTING ATRIBAUX ROUTINE...");
   getToken();
   if (token.type == KW && token.tableIdx == NEW) {
@@ -656,103 +661,106 @@ void atribAux(char target[]) {//até '=' já foi processado
       process();
     } else syntaxError("Type expected");
   } else if (isExprStart(token)) {
-    expr();
+    expr(classScope);
   } else syntaxError("Syntax error: keyword or expression expected");
 
   printf("\n--- DEBUG: FINISHED ATRIBAUX ROUTINE...");
 }
 
-void expr() {
+void expr(char classScope[]) {
   printf("\n--- DEBUG: EXECUTING EXPR ROUTINE...");
-  simpleExpr();
+  simpleExpr(classScope);
   getToken();
   if (isRelationalOperator(token)) {
     relationalOp();
-    simpleExpr();
+    simpleExpr(classScope);
   }
   printf("\n--- DEBUG: FINISHED EXPR ROUTINE...");
 }
 
-void simpleExpr() {
+void simpleExpr(char classScope[]) {
   printf("\n--- DEBUG: EXECUTING SIMPLEEXPR ROUTINE...");
   getToken();
   if (token.type == SN && (token.tableIdx == PLUS || token.tableIdx == MINUS)) {
     process();
   }
-  term();
+  term(classScope);
   getToken();
   while (token.type == SN && (token.tableIdx == PLUS || token.tableIdx == MINUS || token.tableIdx == DOUBLE_PIPE)) {
     process();
-    term();
+    term(classScope);
     getToken();
   }
   printf("\n--- DEBUG: FINISHED SIMPLEEXPR ROUTINE...");
 }
 
-void term() {
+void term(char classScope[]) {
   printf("\n--- DEBUG: EXECUTING TERM ROUTINE...");
-  factor();
+  factor(classScope);
   getToken();
   while (token.type == SN && (token.tableIdx == ASTERISK || token.tableIdx == SLASH || token.tableIdx == DOUBLE_AMP)) {
     process();
-    factor();
+    factor(classScope);
     getToken();
   }
   printf("\n--- DEBUG: FINISHED TERM ROUTINE...");
 }
 
-void factor() {
+void factor(char classScope[]) {
   printf("\n--- DEBUG: EXECUTING FACTOR ROUTINE...");
   getToken();
   if (token.type == SN) {
     if (token.tableIdx == OP_PARENTHESIS) {
       process();
-      expr();
+      expr(classScope);
       processNextIf(matches(SN, CL_PARENTHESIS));
     } else if (token.tableIdx == EXCLAMATION_MARK) {
       process();
-      factor();
+      factor(classScope);
     } else if (token.tableIdx == CIRCUMFLEX) {
       process();
-      factorPostCircumflex(1);
+      factorPostCircumflex(1, classScope);
     }
   } else if (token.type == ID) {
-    factorPostCircumflex(0);
+    factorPostCircumflex(0, classScope);
   } else if (token.type == ICT || token.type == FCT || token.type == CCT) {
     process();
   }
   printf("\n--- DEBUG: FINISHED FACTOR ROUTINE...");
 }
 
-void factorPostCircumflex(int circumflexFound) {
-  char aux[LEXEME_MAX_LENGTH];
+void factorPostCircumflex(int circumflexFound, char classScope[]) {
+  char baseId[LEXEME_MAX_LENGTH];
+  char fieldId[LEXEME_MAX_LENGTH];
 
   processNextIf(matches(ID, -1));
-  validateReferenceInSymbolTable(token.lexeme);
-  strcpy(aux, token.lexeme);
+  validateReference(token.lexeme);
+  strcpy(baseId, token.lexeme);
   getToken();
   if (token.type == SN) {
     if (token.tableIdx == DOT) {
       process();
       processNextIf(matches(ID, -1));
-      validateReferenceInSymbolTable(token.lexeme);
-      validateArithmeticFactor(aux, circumflexFound);
+      strcpy(fieldId, token.lexeme);
+      validateReferenceInTypeTable(token.lexeme);
+      validateScopeAccess(baseId, fieldId, classScope);
+      validateArithmeticFactor(baseId, circumflexFound);
       getToken();
       if (token.type == SN) {
         if (token.tableIdx == OP_BRACKETS) {
           process();
-          expr();
+          expr(classScope);
           processNextIf(matches(SN, CL_BRACKETS));
         }
         else if (token.tableIdx == OP_PARENTHESIS) {
           process();
           getToken();
           if (isExprStart(token)) {
-            expr();
+            expr(classScope);
             getToken();
             while (token.type == SN && token.tableIdx == COMMA) {
               process();
-              expr();
+              expr(classScope);
               getToken();
             }
           }
@@ -761,15 +769,15 @@ void factorPostCircumflex(int circumflexFound) {
       }
     }
     else if (token.tableIdx == OP_BRACKETS) {
-      validateArithmeticFactor(aux, circumflexFound);
+      validateArithmeticFactor(baseId, circumflexFound);
       process();
-      expr();
+      expr(classScope);
       processNextIf(matches(SN, CL_BRACKETS));
     } else {
-      validateArithmeticFactor(aux, circumflexFound);
+      validateArithmeticFactor(baseId, circumflexFound);
     }
   } else {
-    validateArithmeticFactor(aux, circumflexFound);
+    validateArithmeticFactor(baseId, circumflexFound);
   }
 }
 
